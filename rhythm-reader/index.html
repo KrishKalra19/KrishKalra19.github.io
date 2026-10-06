@@ -1,0 +1,1001 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><title>Rhythm Reader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Libre+Caslon+Text:wght@700&family=Courier+Prime&display=swap">
+<style>
+/* Layout: an engraved method-book page — transport plate, exercise index, sticky note case, then the score sheet with justified rhythm-staff systems */
+:root {
+  --desk: #E6DECB;        /* table under the page */
+  --sheet: #F6F0E1;       /* the printed page */
+  --ink: #1F1A14;         /* engraving ink */
+  --sepia: #6E604D;       /* secondary ink, captions */
+  --rule: #CDBF9F;        /* hairlines, staff for UI */
+  --red: #9A2E1F;         /* the teacher's red pencil: playhead, accents, errors */
+  --wash: #F0D9B8;        /* highlighter wash behind the sounding note */
+  --select: #2F5A7A;      /* blue pencil for selection and drop caret */
+  --shadow: rgba(60, 40, 10, .18);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.22  0 0 0 0 0.1  0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --body: "EB Garamond", "Iowan Old Style", Garamond, Georgia, serif;
+  --numeral: "Libre Caslon Text", "Bodoni 72", Georgia, serif;
+  --type: "Courier Prime", "Courier New", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #0F0D0A; --sheet: #1B1813; --ink: #ECE3CF; --sepia: #A99A80; --rule: #3B342A;
+    --red: #E0856C; --wash: #4A3520; --select: #8DB6D6; --shadow: rgba(0,0,0,.55);
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .85  0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #0F0D0A; --sheet: #1B1813; --ink: #ECE3CF; --sepia: #A99A80; --rule: #3B342A;
+  --red: #E0856C; --wash: #4A3520; --select: #8DB6D6; --shadow: rgba(0,0,0,.55);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .85  0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.tmark { display: inline-block; width: 15px; height: 24px; vertical-align: -4px; overflow: visible; }
+html { background: var(--desk); }
+body { background: var(--desk); color: var(--ink); font: 18px/1.45 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 24px; padding-block: 32px 64px; display: grid; gap: 20px; }
+
+/* masthead */
+header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 16px 32px; padding-bottom: 14px; border-bottom: 3px double var(--ink); }
+h1 { font: 400 clamp(2.4rem, 5vw, 3.6rem)/0.95 var(--display); margin: 0; letter-spacing: .005em; }
+.sub { font-style: italic; color: var(--sepia); margin: 8px 0 0; max-width: 58ch; text-wrap: pretty; }
+.count-box { display: grid; justify-items: center; gap: 0; min-width: 120px; }
+.count-box span:first-child { font: 500 12px var(--body); letter-spacing: .2em; text-transform: uppercase; color: var(--sepia); }
+#count { font: 400 3.6rem/1 var(--display); font-variant-numeric: tabular-nums; min-height: 1em; transition: color .06s; }
+#count.live { color: var(--red); }
+@media (max-width: 620px) { header { grid-template-columns: minmax(0, 1fr); } .count-box { justify-items: start; } }
+
+/* transport plate */
+.plate { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 26px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+#play { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--red); color: var(--sheet); display: grid; place-items: center; cursor: pointer; box-shadow: 0 0 0 4px var(--desk), 0 0 0 5px var(--red), 0 6px 14px var(--shadow); flex: none; }
+#play:hover { filter: brightness(1.07); }
+#play svg { width: 20px; height: 20px; fill: currentColor; }
+.ctl { display: grid; gap: 2px; }
+.ctl > .lbl, .lbl { font: 500 12px var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--sepia); }
+.tempo { display: flex; align-items: baseline; gap: 8px; font: 700 20px var(--numeral); }
+.tempo .mark { font-family: var(--body); font-size: 24px; font-weight: 400; }
+input[type=range] { width: 150px; accent-color: var(--red); align-self: center; }
+.tempo .mark .tmark { width: 15px; }
+.vol .vrow { display: flex; align-items: center; gap: 8px; font: 700 15px var(--numeral); font-variant-numeric: tabular-nums; }
+.vol .vrow svg { width: 18px; height: 18px; overflow: visible; }
+.vol input { width: 120px; }
+.vol .vrow.sm span { font: italic 400 14px var(--body); color: var(--sepia); width: 18px; }
+.vol .vrow.sm input { width: 120px; }
+#volOut { min-width: 3ch; }
+#bpmOut { min-width: 3ch; font-variant-numeric: tabular-nums; }
+select { font: 500 17px var(--body); color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--ink); padding: 2px 18px 2px 2px; border-radius: 0; cursor: pointer; appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%); background-position: right 6px top 55%, right 1px top 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+select option { background: var(--sheet); color: var(--ink); }
+.ts { display: flex; align-items: center; gap: 6px; font: 700 18px var(--numeral); }
+.ts select { font: 700 18px var(--numeral); }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.tog { font: 500 13px var(--body); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); background: transparent; border: 1px solid var(--ink); border-radius: 2px; padding: 5px 10px; cursor: pointer; }
+.tog[aria-pressed="true"] { background: var(--ink); color: var(--sheet); }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--select); outline-offset: 3px; }
+
+/* exercise index */
+.index { display: flex; flex-wrap: wrap; gap: 12px 36px; align-items: baseline; }
+.index .sect { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; }
+.index .sect > i { color: var(--sepia); margin-right: 6px; }
+.no { font: 400 20px var(--display); color: var(--ink); background: transparent; border: 0; border-bottom: 2px solid transparent; padding: 0 5px 1px; cursor: pointer; font-variant-numeric: lining-nums; }
+.no:hover { border-bottom-color: var(--rule); }
+.no[aria-current="true"] { color: var(--red); border-bottom-color: var(--red); }
+.no.blank { font: italic 400 17px var(--body); color: var(--sepia); }
+
+/* note case (palette) */
+.case { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 10px 14px; background: var(--sheet); background-image: var(--grain); border: 1px solid var(--rule); box-shadow: 0 10px 22px -16px var(--shadow); }
+.drawer { display: flex; gap: 4px; }
+.pi { width: 58px; height: 66px; display: grid; grid-template-rows: 1fr auto; justify-items: center; padding: 2px 0 4px; border: 1px solid transparent; border-radius: 3px; background: transparent; color: var(--ink); cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; font: inherit; }
+.pi.wide { width: 74px; }
+.pi:hover { border-color: var(--rule); background: color-mix(in srgb, var(--wash) 40%, transparent); }
+.pi:active { cursor: grabbing; }
+.pi svg { width: 100%; height: 46px; overflow: visible; }
+.pi small { font: italic 400 13px var(--body); color: var(--sepia); line-height: 1; }
+.sep { width: 1px; align-self: stretch; background: var(--rule); }
+.mods { display: grid; gap: 5px; }
+.acts { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-left: auto; }
+.act { font: italic 400 17px var(--body); color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--rule); padding: 0 1px; cursor: pointer; }
+.act:hover:not(:disabled) { border-bottom-color: var(--ink); }
+.act:disabled { color: var(--sepia); opacity: .5; cursor: default; }
+
+/* the sheet */
+.sheet { background: var(--sheet); background-image: var(--grain); box-shadow: 0 1px 0 var(--rule), 0 18px 40px -22px var(--shadow); padding: 34px clamp(16px, 4vw, 56px) 40px; display: grid; gap: 8px; min-width: 0; }
+.sheet-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 12px; margin-bottom: 6px; }
+.sheet-head .tm { font: 700 17px var(--numeral); }
+.sheet-head .tm span { font: 400 22px var(--body); }
+.sheet-head h2 { font: 400 2rem/1 var(--display); margin: 0; text-align: center; text-wrap: balance; }
+.sheet-head .meta { text-align: right; font-style: italic; color: var(--sepia); }
+#systems { display: grid; gap: 2px; min-width: 0; }
+#systems svg { display: block; width: 100%; overflow: visible; user-select: none; -webkit-user-select: none; }
+.newbar { margin-top: 8px; border: 1px dashed var(--rule); padding: 10px; text-align: center; font-style: italic; color: var(--sepia); cursor: pointer; }
+.newbar.hot, .newbar.sel { border-color: var(--select); color: var(--select); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; color: var(--sepia); font-size: 15px; font-style: italic; }
+kbd { font: 400 13px var(--type); font-style: normal; border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; color: var(--ink); }
+
+/* engraving */
+.ink { fill: var(--ink); }
+.ln { stroke: var(--ink); fill: none; }
+.hole { fill: var(--sheet); }
+.cnt { font: italic 400 15px var(--body); fill: var(--sepia); text-anchor: middle; }
+.cnt.beat { font-style: normal; font-weight: 600; fill: var(--ink); }
+.tsig { font: 700 25px var(--numeral); fill: var(--ink); text-anchor: middle; }
+.bno { font: italic 400 13px var(--body); fill: var(--sepia); }
+.tup { font: italic 500 14px var(--body); fill: var(--ink); text-anchor: middle; }
+.hit, .bhit { fill: transparent; cursor: pointer; }
+.selbox { fill: none; stroke: var(--select); stroke-width: 1.4; stroke-dasharray: 3 2.5; opacity: 0; }
+.note.sel .selbox { opacity: 1; }
+.lit { fill: var(--wash); opacity: 0; }
+.note.on .lit { opacity: 1; }
+.note.on .head, .note.on .ink { fill: var(--red); }
+.note.on .hole { fill: var(--wash); }
+.note.on .cnt { fill: var(--red); }
+.note.on .ln { stroke: var(--red); }
+.wash { fill: var(--wash); opacity: 0; transition: opacity .15s; }
+.wash.active { opacity: .38; }
+.wash.sel { opacity: .5; fill: color-mix(in srgb, var(--select) 18%, transparent); }
+.ph { stroke: var(--red); stroke-width: 2; stroke-linecap: round; }
+.caret { fill: var(--select); }
+.err { stroke: var(--red); fill: none; stroke-width: 1.2; }
+.errt { font: italic 400 14px var(--body); fill: var(--red); }
+.partial { font: italic 400 14px var(--body); fill: var(--sepia); }
+.empty-t { font: italic 400 17px var(--body); fill: var(--sepia); }
+
+/* text view */
+details { border-top: 1px solid var(--rule); padding-top: 10px; }
+summary { cursor: pointer; font-style: italic; color: var(--sepia); }
+.editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 18px; margin-top: 12px; }
+@media (max-width: 760px) { .editor { grid-template-columns: minmax(0, 1fr); } }
+textarea { width: 100%; min-height: 96px; resize: vertical; font: 400 16px/1.6 var(--type); background: var(--sheet); color: var(--ink); border: 1px solid var(--rule); padding: 10px 12px; border-radius: 0; }
+#err { color: var(--red); font-style: italic; margin-top: 4px; min-height: 1.4em; font-size: 15px; }
+.legend { display: grid; gap: 3px; font-size: 15px; color: var(--sepia); align-content: start; }
+.legend div { display: grid; grid-template-columns: 84px 1fr; gap: 8px; }
+.legend code { font: 400 14px var(--type); color: var(--ink); }
+
+.ghost { position: fixed; left: 0; top: 0; z-index: 60; pointer-events: none; background: var(--sheet); border: 1px solid var(--select); box-shadow: 0 10px 24px var(--shadow); padding: 2px 6px; color: var(--ink); }
+.ghost svg { display: block; width: 64px; height: 46px; overflow: visible; }
+/* plain-score modes */
+.no-follow .ph, .no-follow .lit, .no-follow .wash.active { display: none; }
+.no-follow .note.on .head, .no-follow .note.on .ink { fill: var(--ink); }
+.no-follow .note.on .hole { fill: var(--sheet); }
+.no-follow .note.on .ln { stroke: var(--ink); }
+.no-follow .note.on .cnt { fill: var(--sepia); }
+.no-follow .note.on .cnt.beat { fill: var(--ink); }
+.no-follow #count { visibility: hidden; }
+.no-counts .cnt { display: none; }
+@media (prefers-reduced-motion: reduce) { .wash, #count { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Rhythm Reader</h1>
+      <p class="sub">Choose an exercise or set notes into the bars from the case below, then play it. A red pencil follows each note as it sounds, with the count written underneath.</p>
+    </div>
+    <div class="count-box"><span>Count</span><span id="count">&nbsp;</span></div>
+  </header>
+
+  <section class="plate" aria-label="Playback">
+    <button id="play" type="button" aria-label="Play"><svg viewBox="0 0 20 20" aria-hidden="true"><path id="playIcon" d="M5 2.5l12 7.5-12 7.5z"/></svg></button>
+    <label class="ctl"><span class="lbl">Tempo</span>
+      <span class="tempo"><span class="mark" id="tempoMark">♩</span>=<output id="bpmOut" for="bpm">55</output><input id="bpm" type="range" min="30" max="200" value="55" aria-label="Tempo"></span>
+    </label>
+    <div class="ctl"><span class="lbl">Metre</span>
+      <span class="ts">
+        <select id="tsNum" aria-label="Beats per bar"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>9</option><option>12</option></select>
+        <span>/</span>
+        <select id="tsDen" aria-label="Beat unit"><option>2</option><option selected>4</option><option>8</option><option>16</option></select>
+      </span>
+    </div>
+    <label class="ctl"><span class="lbl">Instrument</span>
+      <select id="sound"><option value="piano">Piano</option><option value="marimba">Marimba</option><option value="block">Woodblock</option><option value="snare">Snare drum</option><option value="clap">Hand clap</option></select>
+    </label>
+    <label class="ctl"><span class="lbl">Metronome</span>
+      <select id="clickSound"><option value="tick">Wood tick</option><option value="cowbell">Cowbell</option><option value="hat">Hi-hat</option><option value="beep">Electronic</option></select>
+    </label>
+    <div class="ctl vol"><span class="lbl">Volume</span>
+      <span class="vrow"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="ink" d="M2 6h3l4-3v10l-4-3H2z"/><path class="ln" stroke-width="1.3" d="M11 5.5q2 2.5 0 5M12.8 3.8q3.4 4.2 0 8.4"/></svg><input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume"><output id="volOut" for="vol">80</output></span>
+      <span class="vrow sm"><span>click</span><input id="cvol" type="range" min="0" max="100" value="70" aria-label="Metronome volume"></span>
+    </div>
+    <div class="toggles">
+      <button class="tog" id="tCounts" type="button" aria-pressed="true" title="Show or hide the 1 e &amp; a written under the notes">Count labels</button>
+      <button class="tog" id="tMet" type="button" aria-pressed="true">Click</button>
+      <button class="tog" id="tSub" type="button" aria-pressed="false">Subdivide</button>
+      <button class="tog" id="tCount" type="button" aria-pressed="true">Count-in</button>
+      <button class="tog" id="tLoop" type="button" aria-pressed="false">Repeat</button>
+      <button class="tog" id="tFollow" type="button" aria-pressed="true" title="Playhead, highlight and live count">Follow along</button>
+    </div>
+  </section>
+
+  <nav class="index" id="index" aria-label="Exercises"></nav>
+
+  <section class="case" aria-label="Note case">
+    <div class="drawer" id="singles"></div>
+    <div class="mods">
+      <button class="tog" id="mDot" type="button" aria-pressed="false">Dotted</button>
+      <button class="tog" id="mRest" type="button" aria-pressed="false">Rest</button>
+    </div>
+    <span class="sep" aria-hidden="true"></span>
+    <div class="drawer" id="groups"></div>
+    <div class="acts">
+      <button class="act" id="aTie" type="button" disabled>tie to next</button>
+      <button class="act" id="aDel" type="button" disabled>delete</button>
+      <button class="act" id="aUndo" type="button" disabled>undo</button>
+      <button class="act" id="aClear" type="button">clear</button>
+    </div>
+  </section>
+
+  <article class="sheet" aria-label="Score">
+    <div class="sheet-head">
+      <div class="tm" id="tmHead"></div>
+      <h2 id="title">No. 16</h2>
+      <div class="meta" id="metaHead"></div>
+    </div>
+    <div id="systems"></div>
+    <div class="newbar" id="newbar">Drop a note here to begin a new bar</div>
+  </article>
+
+  <div class="foot">
+    <span>Drag notes into a bar, or tap them to add after the selected note. Click a note to select it.</span>
+    <span><kbd>w</kbd> <kbd>h</kbd> <kbd>q</kbd> <kbd>e</kbd> <kbd>s</kbd> notes · <kbd>t</kbd> triplet · <kbd>.</kbd> dot · <kbd>r</kbd> rest · <kbd>⌫</kbd> delete · <kbd>space</kbd> play</span>
+  </div>
+
+  <details>
+    <summary>Edit as text</summary>
+    <div class="editor">
+      <div>
+        <textarea id="src" spellcheck="false" autocomplete="off" aria-label="Rhythm as text"></textarea>
+        <div id="err" role="status"></div>
+      </div>
+      <div class="legend">
+        <div><code>w h q e s</code><span>whole, half, quarter, eighth, sixteenth</span></div>
+        <div><code>q.</code><span>dotted (<code>..</code> double)</span></div>
+        <div><code>rq</code><span>rest of that value</span></div>
+        <div><code>[e e e]</code><span>triplet</span></div>
+        <div><code>h _ q</code><span>tie into the next note</span></div>
+        <div><code>|</code><span>barline</span></div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<script>
+const EXERCISES = [
+  { name: "16", ts: [3,4], bpm: 55, src: "q q q | h e e | q. e q _ | q e re rq | q e e q | h rq | q rq e e | h." },
+  { name: "17", ts: [4,4], bpm: 55, src: "h. q | h rq re e | q re e q re e | q e e q q _ | q q e e q | h h" },
+  { name: "18", ts: [2,4], bpm: 55, src: "s s e e e _ | e e q | e e q _ | e e e s s | q e e | rq q" },
+  { name: "19", ts: [3,4], bpm: 55, src: "q q s s s s | q _ e e s s s s | q _ e e q | q _ e e s s s s | q q q | h." },
+  { name: "20", ts: [4,4], bpm: 55, src: "h e e _ e e | q re e q q _ | q e e _ e e e s s | e e _ e e h" },
+  { name: "37", ts: [6,8], bpm: 55, src: "q e q e | q e _ e q | q e e q | q e q." },
+  { name: "38", ts: [6,8], bpm: 55, src: "e e e q. | e e e q. | e e e _ e e e _ | e e e q." },
+  { name: "39", ts: [9,8], bpm: 55, src: "q. _ q e q e | q. _ q e q e | q. q. _ q e | q. rq. rq." },
+  { name: "40", ts: [9,8], bpm: 55, src: "e e e q. q. | q e q re q. | e e e q e q e | q re e e e q." },
+  { name: "41", ts: [6,8], bpm: 55, src: "e. s e e e e | q e e s s e | e e e _ e e e | e. s e q." },
+  { name: "42", ts: [6,8], bpm: 55, src: "e e e e. s e | e s s e e. s e | e e s s s s e e | q e q." },
+  { name: "43", ts: [6,8], bpm: 55, src: "e s s s s e e e | e s s s s q re | e. s e e. s e | e s s s s q." },
+];
+const SECTIONS = [["Simple metre", ["16","17","18","19","20"]], ["Compound metre", ["37","38","39","40","41","42","43"]]];
+
+const DUR = { w: 4, h: 2, q: 1, e: 0.5, s: 0.25 };
+const NAMES = { w: "whole", h: "half", q: "quarter", e: "eighth", s: "sixteenth" };
+const LEVEL = { e: 1, s: 2 };
+const $ = id => document.getElementById(id);
+const src = $("src"), sysBox = $("systems"), countEl = $("count");
+let model = { bars: [] }, sel = null, history = [], LAYOUT = [], current = -1;
+
+/* ---------------- model ---------------- */
+function parse(text) {
+  const toks = text.replace(/([|\[\]_])/g, " $1 ").trim().split(/\s+/).filter(Boolean);
+  const bars = [[]], bad = [];
+  let trip = 0, tripId = 0, tie = false;
+  for (const t of toks) {
+    if (t === "|") { if (bars[bars.length - 1].length) bars.push([]); continue; }
+    if (t === "[") { trip = ++tripId; continue; }
+    if (t === "]") { trip = 0; continue; }
+    if (t === "_") { tie = true; continue; }
+    const m = /^(r)?([whqes])(\.{0,2})$/i.exec(t);
+    if (!m) { bad.push(t); continue; }
+    const rest = !!m[1];
+    bars[bars.length - 1].push({ rest, base: m[2].toLowerCase(), dots: m[3].length, trip, tied: tie && !rest });
+    tie = false;
+  }
+  const out = bars.filter(b => b.length);
+  out.forEach(b => b.forEach(n => n.dur = durOf(n)));
+  return { bars: out, bad };
+}
+function durOf(n) { return DUR[n.base] * (n.dots === 1 ? 1.5 : n.dots === 2 ? 1.75 : 1) * (n.trip ? 2 / 3 : 1); }
+function serialize(bars) {
+  return bars.map(bar => {
+    const out = []; let cur = 0;
+    bar.forEach(n => {
+      if (n.trip !== cur) { if (cur) out.push("]"); if (n.trip) out.push("["); cur = n.trip; }
+      if (n.tied) out.push("_");
+      out.push((n.rest ? "r" : "") + n.base + ".".repeat(n.dots));
+    });
+    if (cur) out.push("]");
+    return out.join(" ").replace(/\[ /g, "[").replace(/ \]/g, "]");
+  }).join(" | ");
+}
+function meter() {
+  const num = +$("tsNum").value, den = +$("tsDen").value;
+  const compound = (den === 8 || den === 16) && num % 3 === 0 && num > 3;
+  const unit = 4 / den, beatLen = compound ? unit * 3 : unit;
+  return { num, den, compound, beatLen, beats: compound ? num / 3 : num, barLen: num * unit };
+}
+const near = (a, b) => Math.abs(a - b) < 1e-6;
+const barTotal = bar => bar.reduce((s, n) => s + n.dur, 0);
+function countLabel(pos, m) {
+  const u = pos / m.beatLen + 1e-9, b = Math.floor(u), f = u - b;
+  if (f < 0.01) return { txt: String(b + 1), beat: true };
+  const map = m.compound ? [[1/3, "&"], [2/3, "a"], [1/6, "ta"], [0.5, "ta"], [5/6, "ta"]]
+                         : [[0.25, "e"], [0.5, "&"], [0.75, "a"], [1/3, "trip"], [2/3, "let"]];
+  for (const [v, s] of map) if (Math.abs(f - v) < 0.01) return { txt: s, beat: false };
+  return { txt: "·", beat: false };
+}
+function fmtBeats(x) {
+  const w = Math.floor(x + 1e-6), f = x - w;
+  if (f < 0.01) return String(w);
+  const fr = [[0.25,"¼"],[0.5,"½"],[0.75,"¾"],[1/3,"⅓"],[2/3,"⅔"],[1/6,"⅙"],[5/6,"⅚"]].find(([v]) => Math.abs(f - v) < 0.01);
+  return fr ? (w ? w : "") + fr[1] : x.toFixed(2);
+}
+
+/* ---------------- engraving primitives ---------------- */
+const Y0 = 66, STEM = 31, SH = 128;           // staff line y, stem length, system height
+const f1 = v => Math.round(v * 10) / 10;
+function svgHead(x, y, base) {
+  if (base === "w") return `<ellipse class="head ink" cx="${x}" cy="${y}" rx="7.2" ry="4.7" transform="rotate(-14 ${x} ${y})"/><ellipse class="hole" cx="${x}" cy="${y}" rx="3.1" ry="2.6" transform="rotate(58 ${x} ${y})"/>`;
+  const e = `<ellipse class="head ink" cx="${x}" cy="${y}" rx="6" ry="4.25" transform="rotate(-22 ${x} ${y})"/>`;
+  return base === "h" ? e + `<ellipse class="hole" cx="${x}" cy="${y}" rx="4.4" ry="1.85" transform="rotate(-22 ${x} ${y})"/>` : e;
+}
+const stemX = x => x + 4.6;
+function svgStem(x, y, top) { return `<rect class="ink" x="${f1(stemX(x))}" y="${f1(top)}" width="1.4" height="${f1(y - 1.5 - top)}"/>`; }
+function svgFlags(x, top, count) {
+  let s = ""; const sx = stemX(x) + 1.3;
+  for (let k = 0; k < count; k++) {
+    const t = top + k * 7.5;
+    s += `<path class="ink" d="M${f1(sx)} ${f1(t)} c0.4 5.2 9.2 7.6 7.6 18.5 c-0.2 -6.6 -4 -9.8 -7.6 -10.6 z"/>`;
+  }
+  return s;
+}
+function svgDots(x, y, dots, rest) {
+  let s = ""; for (let i = 0; i < dots; i++) s += `<circle class="ink" cx="${f1(x + (rest ? 13 : 11.5) + i * 5)}" cy="${y - 4.6}" r="1.85"/>`;
+  return s;
+}
+function svgRest(x, y, base) {
+  switch (base) {
+    case "w": return `<rect class="ink" x="${x - 6}" y="${y}" width="12" height="5"/>`;
+    case "h": return `<rect class="ink" x="${x - 6}" y="${y - 5}" width="12" height="5"/>`;
+    case "q": return `<path class="ln" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" d="M${x - 2} ${y - 13} L${x + 3.5} ${y - 6.5} L${x - 1.5} ${y - 1} L${x + 4} ${y + 5} Q${x - 4} ${y + 2.5} ${x + 0.5} ${y + 11}"/>`;
+    case "e": return `<circle class="ink" cx="${x - 2}" cy="${y - 5}" r="2.5"/><path class="ln" stroke-width="1.5" stroke-linecap="round" d="M${x - 2} ${y - 3} Q${x + 1.5} ${y - 1.5} ${x + 4.5} ${y - 7} L${x - 0.5} ${y + 10}"/>`;
+    case "s": return `<circle class="ink" cx="${x}" cy="${y - 7}" r="2.4"/><path class="ln" stroke-width="1.5" stroke-linecap="round" d="M${x} ${y - 5} Q${x + 3.5} ${y - 3.5} ${x + 6.5} ${y - 9} L${x} ${y + 12}"/><circle class="ink" cx="${x - 2.4}" cy="${y + 0.5}" r="2.4"/><path class="ln" stroke-width="1.5" stroke-linecap="round" d="M${x - 2.4} ${y + 2.4} Q${x + 1} ${y + 3.6} ${x + 4.2} ${y - 1}"/>`;
+  }
+  return "";
+}
+function svgBeam(x1, x2, t) { return `<rect class="ink" x="${f1(x1)}" y="${f1(t)}" width="${f1(Math.max(1, x2 - x1 + 1.4))}" height="4.8"/>`; }
+
+// beam runs: indexes of notes in a bar that share beams
+function beamRuns(bar, m) {
+  const runs = []; let pos = 0, run = [];
+  const flush = () => { if (run.length) runs.push(run); run = []; };
+  const winOf = p => Math.floor(p / m.beatLen + 1e-9);
+  bar.forEach((n, i) => {
+    const beamable = !n.rest && LEVEL[n.base];
+    if (!beamable) { flush(); pos += n.dur; return; }
+    if (run.length) {
+      const prev = bar[run[run.length - 1]];
+      const sameTrip = n.trip && prev.trip === n.trip;
+      const sameWin = !n.trip && !prev.trip && winOf(pos) === winOf(run.start) && pos + n.dur <= (winOf(run.start) + 1) * m.beatLen + 1e-6;
+      if (!(sameTrip || sameWin)) flush();
+    }
+    if (!run.length) run.start = pos;
+    run.push(i); pos += n.dur;
+  });
+  flush();
+  return runs;
+}
+
+// draws one group of notes; xs = head x for each note. returns {notes:[svg per note], shared:svg}
+function engraveNotes(bar, xs, m, y0) {
+  const runs = beamRuns(bar, m), inRun = new Map();
+  runs.forEach(r => { if (r.length > 1) r.forEach(i => inRun.set(i, r)); });
+  const per = bar.map(() => ""); let shared = "";
+  const top = y0 - STEM;
+  bar.forEach((n, i) => {
+    const x = xs[i];
+    if (n.rest) { per[i] += svgRest(x, y0, n.base) + svgDots(x, y0, n.dots, true); return; }
+    per[i] += svgHead(x, y0, n.base) + svgDots(x, y0, n.dots, false);
+    if (n.base === "w") return;
+    per[i] += svgStem(x, y0, top);
+    if (!inRun.has(i) && LEVEL[n.base]) per[i] += svgFlags(x, top, LEVEL[n.base]);
+  });
+  runs.filter(r => r.length > 1).forEach(r => {
+    const sx = i => stemX(xs[i]);
+    shared += svgBeam(sx(r[0]), sx(r[r.length - 1]), top);
+    const t2 = top + 7.6;
+    for (let k = 0; k < r.length; k++) {
+      const i = r[k]; if (LEVEL[bar[i].base] < 2) continue;
+      const nxt = r[k + 1], prv = r[k - 1];
+      if (nxt != null && LEVEL[bar[nxt].base] >= 2) shared += svgBeam(sx(i), sx(nxt), t2);
+      else if (!(prv != null && LEVEL[bar[prv].base] >= 2)) {
+        if (k === 0) shared += svgBeam(sx(i), sx(i) + 8, t2);
+        else shared += svgBeam(sx(i) - 8, sx(i), t2);
+      }
+    }
+  });
+  // tuplets
+  const trips = new Map();
+  bar.forEach((n, i) => { if (n.trip) { if (!trips.has(n.trip)) trips.set(n.trip, []); trips.get(n.trip).push(i); } });
+  trips.forEach(ix => {
+    const a = ix[0], b = ix[ix.length - 1];
+    const beamed = ix.length > 1 && inRun.get(a) && inRun.get(a) === inRun.get(b);
+    const x1 = xs[a] - 3, x2 = stemX(xs[b]) + 2, cx = (xs[a] + stemX(xs[b])) / 2, ty = top - 7;
+    if (!beamed) shared += `<path class="ln" stroke-width="1" d="M${f1(x1)} ${ty + 4} V${ty} H${f1(cx - 6)} M${f1(cx + 6)} ${ty} H${f1(x2)} V${ty + 4}"/>`;
+    shared += `<text class="tup" x="${f1(cx)}" y="${ty + 4}">3</text>`;
+  });
+  return { per, shared };
+}
+
+/* ---------------- layout & render ---------------- */
+const slotW = n => 15 + 27 * Math.sqrt(n.dur) + (n.dots ? 7 : 0) + (n.rest ? 0 : 0);
+function layout(width) {
+  const m = meter();
+  const bars = model.bars.length ? model.bars : [[]];
+  const P0 = 74, PN = 32, PADL = 16, PADR = 10, avail = width - 6;
+  const mins = bars.map(b => b.length ? PADL + PADR + b.reduce((s, n) => s + slotW(n), 0) : 220);
+  const systems = []; let cur = null;
+  bars.forEach((b, bi) => {
+    const pre = systems.length || (cur && cur.bars.length) ? PN : P0;
+    if (!cur) cur = { first: systems.length === 0, prefix: systems.length === 0 ? P0 : PN, bars: [], w: systems.length === 0 ? P0 : PN };
+    if (cur.bars.length && cur.w + mins[bi] > avail) { systems.push(cur); cur = { first: false, prefix: PN, bars: [], w: PN }; }
+    cur.bars.push(bi); cur.w += mins[bi];
+  });
+  if (cur) systems.push(cur);
+  systems.forEach((s, si) => {
+    const natural = s.w - s.prefix, room = avail - s.prefix;
+    const last = si === systems.length - 1;
+    const scale = (!last || natural / room > 0.62) ? room / natural : Math.min(1.25, room / natural);
+    let x = s.prefix;
+    s.layout = s.bars.map(bi => {
+      const bar = bars[bi], wBar = mins[bi] * scale;
+      const inner = wBar - (PADL + PADR) * scale;
+      const tot = bar.reduce((a, n) => a + slotW(n), 0) || 1;
+      let nx = x + PADL * scale;
+      const notes = bar.map(n => { const w = slotW(n) / tot * inner; const o = { s0: nx, s1: nx + w, hx: nx + 7 }; nx += w; return o; });
+      const L = { bi, x0: x, x1: x + wBar, notes };
+      x += wBar; return L;
+    });
+    s.end = x;
+  });
+  return systems;
+}
+
+function render() {
+  stop();
+  const { bars, bad } = parse(src.value);
+  model = { bars };
+  $("err").textContent = bad.length ? `Couldn't read: ${bad.join(", ")}. Use w h q e s, r for rests, a dot for dotted.` : "";
+  if (sel && (sel.bar > bars.length || (sel.idx != null && (!bars[sel.bar] || sel.idx >= bars[sel.bar].length)))) sel = null;
+  draw();
+  updateActions();
+  updateHead();
+}
+
+function draw() {
+  const m = meter();
+  const width = Math.max(300, sysBox.clientWidth || 900);
+  const systems = layout(width);
+  const empty = !model.bars.length;
+  let html = "";
+  systems.forEach((s, si) => {
+    let g = "";
+    const y0 = Y0;
+    // staff line & clef & time signature
+    g += `<line class="ln" stroke-width="1" x1="2" x2="${f1(s.end)}" y1="${y0}" y2="${y0}"/>`;
+    g += `<rect class="ink" x="10" y="${y0 - 10}" width="3.4" height="20"/><rect class="ink" x="17" y="${y0 - 10}" width="3.4" height="20"/>`;
+    if (s.first) g += `<text class="tsig" x="50" y="${y0 - 2}">${m.num}</text><text class="tsig" x="50" y="${y0 + 21}">${m.den}</text>`;
+    s.layout.forEach((L, k) => {
+      const bi = L.bi, bar = empty ? [] : model.bars[bi];
+      const selBar = sel && sel.bar === bi && sel.idx == null;
+      g += `<rect class="wash${selBar ? " sel" : ""}" data-wash="${bi}" x="${f1(L.x0)}" y="${y0 - 52}" width="${f1(L.x1 - L.x0)}" height="${SH - 20}"/>`;
+      g += `<rect class="bhit" data-bar="${bi}" x="${f1(L.x0)}" y="0" width="${f1(L.x1 - L.x0)}" height="${SH}"/>`;
+      if (k === 0 && !empty) g += `<text class="bno" x="${f1(s.first ? 6 : 6)}" y="${y0 - 40}">${bi + 1}</text>`;
+      if (empty) { g += `<text class="empty-t" x="${f1(L.x0 + 18)}" y="${y0 - 14}">drag a note onto the line</text>`; }
+      const xs = L.notes.map(o => o.hx);
+      const { per, shared } = bar.length ? engraveNotes(bar, xs, m, y0) : { per: [], shared: "" };
+      let pos = 0;
+      bar.forEach((n, i) => {
+        const o = L.notes[i], c = countLabel(pos, m);
+        n.count = c.txt; pos += n.dur;
+        const isSel = sel && sel.bar === bi && sel.idx === i;
+        g += `<g class="note${isSel ? " sel" : ""}" data-bar="${bi}" data-idx="${i}">` +
+             `<rect class="lit" x="${f1(o.s0 + 1)}" y="${y0 - 44}" width="${f1(o.s1 - o.s0 - 2)}" height="86" rx="2"/>` +
+             per[i] +
+             `<text class="cnt${c.beat ? " beat" : ""}" x="${f1(o.hx + 2)}" y="${y0 + 34}">${n.rest || n.tied ? "(" + c.txt + ")" : c.txt}</text>` +
+             `<rect class="selbox" x="${f1(o.s0 + 1)}" y="${y0 - 44}" width="${f1(o.s1 - o.s0 - 2)}" height="86" rx="2"/>` +
+             `<rect class="hit" x="${f1(o.s0)}" y="${y0 - 48}" width="${f1(o.s1 - o.s0)}" height="94"/></g>`;
+      });
+      g += shared;
+      // barline
+      const lastBar = !empty && bi === model.bars.length - 1;
+      if (lastBar) g += `<rect class="ink" x="${f1(L.x1 - 8)}" y="${y0 - 14}" width="1.3" height="28"/><rect class="ink" x="${f1(L.x1 - 4.5)}" y="${y0 - 14}" width="4.5" height="28"/>`;
+      else g += `<rect class="ink" x="${f1(L.x1 - 0.6)}" y="${y0 - 14}" width="1.3" height="28"/>`;
+      // bar status
+      if (bar.length) {
+        const total = barTotal(bar);
+        if (!near(total, m.barLen)) {
+          const isLast = bi === model.bars.length - 1;
+          const msg = `${fmtBeats(total / m.beatLen)} of ${m.beats} beats`;
+          if (isLast && total < m.barLen) g += `<text class="partial" x="${f1(L.x0 + 14)}" y="${y0 + 56}">${msg} so far</text>`;
+          else {
+            let d = `M${f1(L.x0 + 8)} ${y0 + 44}`;
+            for (let x = L.x0 + 8; x < L.x1 - 12; x += 8) d += ` q2 -3 4 0 t4 0`;
+            g += `<path class="err" d="${d}"/><text class="errt" x="${f1(L.x0 + 10)}" y="${y0 + 59}">${msg}</text>`;
+          }
+        }
+      }
+    });
+    // ties drawn on top of everything in this system
+    g += `<g class="ties"></g><rect class="caret" hidden x="0" y="${y0 - 40}" width="3" height="70"/>` +
+         `<line class="ph" hidden x1="0" x2="0" y1="${y0 - 50}" y2="${y0 + 40}"/>`;
+    html += `<svg data-sys="${si}" viewBox="0 0 ${width} ${SH}" height="${SH}" preserveAspectRatio="xMinYMin meet" role="img" aria-label="Line ${si + 1} of the rhythm">${g}</svg>`;
+  });
+  sysBox.innerHTML = html;
+  LAYOUT = systems.map((s, si) => ({ ...s, svg: sysBox.children[si] }));
+
+  // wire note refs + positions; ties
+  const flat = [];
+  LAYOUT.forEach((s, si) => s.layout.forEach(L => {
+    if (empty) return;
+    model.bars[L.bi].forEach((n, i) => {
+      n.el = s.svg.querySelector(`g.note[data-bar="${L.bi}"][data-idx="${i}"]`);
+      n.hx = L.notes[i].hx; n.sys = si; n.barEnd = L.x1;
+      flat.push(n);
+    });
+  }));
+  flat.forEach((n, k) => {
+    const nx = flat[k + 1];
+    n.nx = nx && nx.sys === n.sys ? nx.hx : n.barEnd - 6;
+    if (nx && nx.tied) {
+      const y = Y0 + 8;
+      const arc = (a, b) => { const mid = (a + b) / 2, d = Math.min(11, 4 + (b - a) * 0.12); return `<path class="ink" d="M${f1(a)} ${y} Q${f1(mid)} ${f1(y + d)} ${f1(b)} ${y} Q${f1(mid)} ${f1(y + d - 2.4)} ${f1(a)} ${y} Z"/>`; };
+      if (nx.sys === n.sys) LAYOUT[n.sys].svg.querySelector(".ties").innerHTML += arc(n.hx + 3, nx.hx - 3);
+      else {
+        LAYOUT[n.sys].svg.querySelector(".ties").innerHTML += arc(n.hx + 3, LAYOUT[n.sys].end - 2);
+        LAYOUT[nx.sys].svg.querySelector(".ties").innerHTML += arc(LAYOUT[nx.sys].prefix - 6, nx.hx - 3);
+      }
+    }
+  });
+  $("newbar").classList.toggle("sel", !!(sel && sel.bar === model.bars.length && model.bars.length));
+  $("newbar").hidden = empty;
+}
+
+function updateHead() {
+  const m = meter(), i = current;
+  $("title").textContent = i >= 0 ? `No. ${EXERCISES[i].name}` : (model.bars.length ? "Your rhythm" : "A blank page");
+  const mark = tempoSVG(m);
+  $("tempoMark").innerHTML = mark;
+  $("tmHead").innerHTML = `${mark} = ${$("bpm").value}`;
+  $("metaHead").textContent = `${m.compound ? "Compound" : "Simple"} ${m.beats === 2 ? "duple" : m.beats === 3 ? "triple" : m.beats === 4 ? "quadruple" : ""} metre, ${m.num}/${m.den}`.replace("  ", " ");
+}
+
+function tempoSVG(m) {
+  const base = m.compound ? (m.den === 16 ? "e" : "q") : ({ 2: "h", 4: "q", 8: "e", 16: "s" })[m.den];
+  const n = { rest: false, base, dots: m.compound ? 1 : 0, trip: 0, tied: false }; n.dur = durOf(n);
+  const { per } = engraveNotes([n], [5], { beatLen: 99 }, 33);
+  return `<svg class="tmark" viewBox="-2 0 ${m.compound ? 22 : 16} 38" aria-label="${NAMES[base]}${m.compound ? " dotted" : ""} note">${per[0]}</svg>`;
+}
+/* ---------------- editing ---------------- */
+function commit(bars) {
+  history.push(src.value); if (history.length > 100) history.shift();
+  src.value = serialize(bars);
+  render();
+}
+const clone = bars => bars.map(b => b.map(n => ({ rest: n.rest, base: n.base, dots: n.dots, trip: n.trip, tied: n.tied, dur: n.dur })));
+const maxTrip = bars => bars.reduce((m, b) => b.reduce((mm, n) => Math.max(mm, n.trip), m), 0);
+const isOn = id => $(id).getAttribute("aria-pressed") === "true";
+function makeNotes(kind, bars) {
+  const dots = isOn("mDot") ? 1 : 0, rest = isOn("mRest");
+  const mk = (base, d = 0, r = false, trip = 0) => ({ rest: r, base, dots: d, trip, tied: false });
+  if (DUR[kind]) return [mk(kind, dots, rest)];
+  if (kind === "ee") return [mk("e"), mk("e")];
+  if (kind === "eee") return [mk("e"), mk("e"), mk("e")];
+  if (kind === "ssss") return [mk("s"), mk("s"), mk("s"), mk("s")];
+  if (kind === "es") return [mk("e", 1), mk("s")];
+  if (kind === "ses") return [mk("s"), mk("e"), mk("s")];
+  if (kind === "trip") { const id = maxTrip(bars) + 1; return [mk("e", 0, false, id), mk("e", 0, false, id), mk("e", 0, false, id)]; }
+  return [];
+}
+function insertAt(kind, barIdx, pos) {
+  const bars = clone(model.bars), notes = makeNotes(kind, bars);
+  if (barIdx >= bars.length) { bars.push([]); barIdx = bars.length - 1; pos = 0; }
+  bars[barIdx].splice(pos, 0, ...notes);
+  sel = { bar: barIdx, idx: pos + notes.length - 1 };
+  commit(bars);
+}
+function insertTap(kind) {
+  const m = meter(), bars = model.bars;
+  if (sel && sel.idx != null && bars[sel.bar]) {
+    let p = sel.idx + 1; const b = bars[sel.bar], tid = b[sel.idx].trip;
+    if (tid) while (p < b.length && b[p].trip === tid) p++;
+    if (p === b.length && barTotal(b) >= m.barLen - 1e-6) return insertAt(kind, sel.bar + 1 < bars.length ? sel.bar + 1 : bars.length, 0);
+    return insertAt(kind, sel.bar, p);
+  }
+  if (sel && sel.idx == null) {
+    if (sel.bar >= bars.length) return insertAt(kind, bars.length, 0);
+    return insertAt(kind, sel.bar, bars[sel.bar].length);
+  }
+  const last = bars.length - 1;
+  if (last < 0 || barTotal(bars[last]) >= m.barLen - 1e-6) return insertAt(kind, bars.length, 0);
+  insertAt(kind, last, bars[last].length);
+}
+function deleteSel() {
+  if (!sel || sel.idx == null) return;
+  const bars = clone(model.bars);
+  bars[sel.bar].splice(sel.idx, 1);
+  if (!bars[sel.bar].length) { bars.splice(sel.bar, 1); sel = bars.length ? { bar: Math.max(0, sel.bar - 1), idx: null } : null; }
+  else sel = { bar: sel.bar, idx: Math.max(0, sel.idx - 1) };
+  commit(bars);
+}
+function nextOf(s, bars) {
+  if (s.idx + 1 < bars[s.bar].length) return { bar: s.bar, idx: s.idx + 1 };
+  if (s.bar + 1 < bars.length) return { bar: s.bar + 1, idx: 0 };
+  return null;
+}
+function toggleTie() {
+  if (!sel || sel.idx == null) return;
+  const bars = clone(model.bars), nx = nextOf(sel, bars);
+  if (!nx || bars[sel.bar][sel.idx].rest || bars[nx.bar][nx.idx].rest) return;
+  bars[nx.bar][nx.idx].tied = !bars[nx.bar][nx.idx].tied;
+  commit(bars);
+}
+function undo() { if (!history.length) return; src.value = history.pop(); render(); }
+function updateActions() {
+  const n = sel && sel.idx != null && model.bars[sel.bar] && model.bars[sel.bar][sel.idx];
+  $("aDel").disabled = !n;
+  let tieOk = false;
+  if (n) { const nx = nextOf(sel, model.bars); tieOk = !!nx && !n.rest && !model.bars[nx.bar][nx.idx].rest; }
+  $("aTie").disabled = !tieOk;
+  $("aTie").textContent = tieOk && model.bars[nextOf(sel, model.bars).bar][nextOf(sel, model.bars).idx].tied ? "remove tie" : "tie to next";
+  $("aUndo").disabled = !history.length;
+}
+
+/* ---------------- note case ---------------- */
+const SINGLES = [["w", "whole"], ["h", "half"], ["q", "quarter"], ["e", "eighth"], ["s", "16th"]];
+const GROUPS = [["ee", "pair"], ["eee", "three"], ["ssss", "four 16ths"], ["es", "dotted pair"], ["ses", "16·8·16"], ["trip", "triplet"]];
+function iconSVG(kind, w = 58) {
+  const fakeM = { beatLen: 99, compound: false };
+  const notes = makeNotes(kind, []).map(n => ({ ...n, dur: durOf(n), trip: n.trip ? 1 : 0 }));
+  const y0 = 38, gap = notes.length > 3 ? 11 : notes.length > 2 ? 14 : 18;
+  const span = (notes.length - 1) * gap;
+  const startX = w / 2 - span / 2 - 3;
+  const xs = notes.map((_, i) => startX + i * gap);
+  const { per, shared } = engraveNotes(notes, xs, fakeM, y0);
+  return `<svg viewBox="0 0 ${w} 46" aria-hidden="true"><line class="ln" stroke-width=".8" x1="4" x2="${w - 4}" y1="${y0}" y2="${y0}" opacity=".35"/>${per.join("")}${shared}</svg>`;
+}
+function buildCase() {
+  const s = $("singles"); s.innerHTML = "";
+  SINGLES.forEach(([k, label]) => s.appendChild(caseItem(k, label + (isOn("mDot") ? " ·" : ""), 58)));
+  const g = $("groups"); g.innerHTML = "";
+  GROUPS.forEach(([k, label]) => g.appendChild(caseItem(k, label, 74)));
+}
+function caseItem(kind, label, w) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "pi" + (w > 60 ? " wide" : ""); b.dataset.kind = kind;
+  b.innerHTML = iconSVG(kind, w) + `<small>${label}</small>`;
+  b.setAttribute("aria-label", `Add ${label}`);
+  b.addEventListener("pointerdown", startDrag);
+  b.addEventListener("click", e => { if (e.detail === 0) insertTap(kind); });
+  return b;
+}
+
+/* ---------------- drag & drop ---------------- */
+let drag = null, ghost = null;
+function startDrag(e) {
+  if (e.button !== 0) return;
+  const btn = e.currentTarget; btn.setPointerCapture(e.pointerId);
+  drag = { kind: btn.dataset.kind, x0: e.clientX, y0: e.clientY, moving: false, btn };
+  btn.addEventListener("pointermove", moveDrag);
+  btn.addEventListener("pointerup", endDrag, { once: true });
+  btn.addEventListener("pointercancel", cleanupDrag, { once: true });
+}
+function moveDrag(e) {
+  if (!drag) return;
+  if (!drag.moving && Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > 6) {
+    drag.moving = true; stop();
+    ghost = document.createElement("div"); ghost.className = "ghost"; ghost.innerHTML = iconSVG(drag.kind, 64);
+    document.body.appendChild(ghost);
+  }
+  if (!drag.moving) return;
+  ghost.style.transform = `translate(${e.clientX - 34}px, ${e.clientY - 58}px)`;
+  showTarget(dropTarget(e.clientX, e.clientY));
+  if (e.clientY > innerHeight - 60) scrollBy(0, 14); else if (e.clientY < 60) scrollBy(0, -14);
+}
+function endDrag(e) {
+  const d = drag; cleanupDrag();
+  if (!d) return;
+  if (!d.moving) { insertTap(d.kind); return; }
+  const t = dropTarget(e.clientX, e.clientY);
+  if (t) insertAt(d.kind, t.bar, t.pos);
+}
+function cleanupDrag() {
+  if (drag) drag.btn.removeEventListener("pointermove", moveDrag);
+  drag = null; ghost?.remove(); ghost = null; showTarget(null);
+}
+function dropTarget(x, y) {
+  const hit = document.elementFromPoint(x, y);
+  if (hit && hit.closest("#newbar")) return { bar: model.bars.length, pos: 0, newbar: true };
+  for (const s of LAYOUT) {
+    const r = s.svg.getBoundingClientRect();
+    if (y < r.top - 6 || y > r.bottom + 6 || x < r.left - 10 || x > r.right + 10) continue;
+    const sx = (x - r.left) * (s.svg.viewBox.baseVal.width / r.width);
+    let L = s.layout.find(L => sx >= L.x0 && sx <= L.x1) || (sx < s.layout[0].x0 ? s.layout[0] : s.layout[s.layout.length - 1]);
+    const bar = model.bars[L.bi] || [];
+    const units = [];
+    for (let i = 0; i < bar.length;) { const tid = bar[i].trip; let j = i + 1; if (tid) while (j < bar.length && bar[j].trip === tid) j++; units.push({ i, l: L.notes[i].s0, r: L.notes[j - 1].s1 }); i = j; }
+    let pos = bar.length, cx = bar.length ? L.notes[bar.length - 1].s1 : L.x0 + 14;
+    for (const u of units) if (sx < (u.l + u.r) / 2) { pos = u.i; cx = u.l; break; }
+    if (bar.length && pos === bar.length && L.bi === model.bars.length - 1 && barTotal(bar) >= meter().barLen - 1e-6 && sx > L.x1 - 4)
+      return { bar: model.bars.length, pos: 0, newbar: true };
+    return { bar: model.bars.length ? L.bi : 0, pos, sys: s, cx, L };
+  }
+  return null;
+}
+function showTarget(t) {
+  LAYOUT.forEach(s => { s.svg.querySelector(".caret").hidden = true; s.svg.querySelectorAll(".wash.hot").forEach(w => w.classList.remove("hot", "sel")); });
+  $("newbar").classList.toggle("hot", !!(t && t.newbar));
+  if (!t || t.newbar) return;
+  const c = t.sys.svg.querySelector(".caret"); c.hidden = false; c.setAttribute("x", f1(t.cx - 1.5));
+  const w = t.sys.svg.querySelector(`.wash[data-wash="${t.L.bi}"]`); if (w) w.classList.add("hot", "sel");
+}
+
+/* ---------------- audio ---------------- */
+let ctx = null, master = null, verb = null, noiseBuf = null, outGain = null, clickBus = null;
+const volCurve = v => Math.pow(v / 100, 2) * 1.4;
+let playing = false, raf = 0, loopTimer = 0, events = [], countIn = [];
+function ensureCtx() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: "interactive" });
+    const len = Math.floor(ctx.sampleRate * 1.6), ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.4); }
+    outGain = ctx.createGain(); outGain.gain.value = volCurve(+$("vol").value); outGain.connect(ctx.destination);
+    verb = ctx.createConvolver(); verb.buffer = ir;
+    const wet = ctx.createGain(); wet.gain.value = 0.2; verb.connect(wet).connect(outGain);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const nd = noiseBuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  }
+  if (ctx.state === "suspended") ctx.resume();
+}
+function bus(level, dest) { const g = ctx.createGain(); g.gain.value = level; g.connect(dest || master); return g; }
+const cbus = level => bus(level, clickBus || master);
+function osc(type, f, t, stopAt, dest) { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.connect(dest); o.start(t); o.stop(stopAt); return o; }
+function vca(t, peak, tau, dest, att = 0.002) { const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(peak, t + att); g.gain.setTargetAtTime(0, t + att, tau); g.connect(dest); return g; }
+function noise(t, dur, dest) { const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.connect(dest); s.start(t, Math.random() * 0.5); s.stop(t + dur); return s; }
+function filt(type, f, q, dest) { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; b.connect(dest); return b; }
+const PITCH = 523.25;
+const VOICES = {
+  piano(t, len) {
+    const end = t + Math.max(len - 0.035, 0.07), out = bus(0.2);
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.Q.value = 0.4;
+    lp.frequency.setValueAtTime(6500, t); lp.frequency.setTargetAtTime(1900, t, 0.45); lp.connect(out);
+    [[1, 1], [1.0018, 0.5], [2, 0.5], [3, 0.26], [4, 0.15], [5, 0.08], [6, 0.05]].forEach(([r, a]) => {
+      const n = Math.max(1, Math.round(r)), g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(a, t + 0.004);
+      g.gain.setTargetAtTime(a * 0.04, t + 0.004, 1.1 / (0.6 * n + 0.4)); g.gain.setTargetAtTime(0, end, 0.045);
+      g.connect(lp); osc("sine", PITCH * r * (1 + 0.0003 * n * n), t, end + 0.4, g);
+    });
+    noise(t, 0.03, filt("bandpass", 2800, 1.5, vca(t, 0.12, 0.008, out)));
+  },
+  marimba(t, len) {
+    const end = t + Math.max(len - 0.03, 0.08), out = bus(0.34);
+    [[1, 0.9, 0.42], [3.93, 0.28, 0.05], [9.2, 0.06, 0.015]].forEach(([r, a, tau]) => { const g = vca(t, a, tau, out); g.gain.setTargetAtTime(0, end, 0.04); osc("sine", PITCH * r, t, end + 0.3, g); });
+  },
+  block(t) {
+    const out = bus(0.5), g = vca(t, 0.8, 0.045, out), o = osc("sine", 980, t, t + 0.25, g);
+    o.frequency.exponentialRampToValueAtTime(860, t + 0.05);
+    noise(t, 0.04, filt("bandpass", 2400, 6, vca(t, 0.9, 0.012, out)));
+  },
+  snare(t) {
+    const out = bus(0.5);
+    noise(t, 0.3, filt("highpass", 1300, 0.7, vca(t, 0.55, 0.07, out)));
+    noise(t, 0.3, filt("bandpass", 5200, 1, vca(t, 0.25, 0.1, out)));
+    const o = osc("triangle", 210, t, t + 0.2, vca(t, 0.6, 0.045, out)); o.frequency.exponentialRampToValueAtTime(150, t + 0.06);
+  },
+  clap(t) {
+    const out = bus(0.6), g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    [0, 0.011, 0.022].forEach(o => { g.gain.setValueAtTime(0.9, t + o); g.gain.setTargetAtTime(0.08, t + o + 0.001, 0.004); });
+    g.gain.setValueAtTime(0.9, t + 0.033); g.gain.setTargetAtTime(0, t + 0.034, 0.08);
+    g.connect(out); noise(t, 0.4, filt("bandpass", 1150, 1.3, g));
+  },
+};
+const CLICKS = {
+  tick(t, l) { const out = cbus([0.18, 0.42, 0.6][l]); osc("sine", [1900, 1900, 2600][l], t, t + 0.06, vca(t, 0.9, 0.012, out)); noise(t, 0.02, filt("highpass", 5000, 0.7, vca(t, 0.35, 0.005, out))); },
+  beep(t, l) { const out = cbus([0.06, 0.15, 0.22][l]); osc("sine", [1320, 1320, 1760][l], t, t + 0.07, vca(t, 1, 0.02, out)); },
+  cowbell(t, l) { const out = cbus([0.08, 0.2, 0.3][l]), bp = filt("bandpass", 2400, 1.2, vca(t, 1, l ? 0.09 : 0.04, out)), k = l === 2 ? 1.12 : 1; osc("square", 540 * k, t, t + 0.4, bp); osc("square", 800 * k, t, t + 0.4, bp); },
+  hat(t, l) { const out = cbus([0.18, 0.35, 0.5][l]); noise(t, 0.2, filt("highpass", 7200, 0.8, vca(t, 1, [0.015, 0.03, 0.05][l], out))); },
+};
+const secPerQuarter = () => 60 / +$("bpm").value / meter().beatLen;
+
+function schedulePass(start) {
+  const spq = secPerQuarter(), m = meter();
+  const voice = VOICES[$("sound").value], click = CLICKS[$("clickSound").value];
+  const sub = isOn("tSub") ? (m.compound ? 3 : 2) : 1;
+  let t = start; const evs = [];
+  model.bars.forEach(bar => {
+    if (isOn("tMet")) for (let k = 0; k < m.beats; k++) {
+      const bt = t + k * m.beatLen * spq; click(bt, k === 0 ? 2 : 1);
+      for (let s = 1; s < sub; s++) click(bt + (s / sub) * m.beatLen * spq, 0);
+    }
+    bar.forEach(n => { evs.push({ t, dur: n.dur * spq, n }); t += n.dur * spq; });
+  });
+  evs.forEach((e, i) => {
+    if (e.n.rest || e.n.tied) return;
+    let len = e.dur; for (let j = i + 1; j < evs.length && evs[j].n.tied; j++) len += evs[j].dur;
+    voice(e.t, len);
+  });
+  events = evs; return t;
+}
+function play() {
+  if (!model.bars.length) return;
+  ensureCtx();
+  master = ctx.createGain(); master.gain.value = 0.9;
+  const comp = ctx.createDynamicsCompressor(); comp.threshold.value = -10; comp.ratio.value = 4;
+  master.connect(comp).connect(outGain); master.connect(verb);
+  clickBus = ctx.createGain(); clickBus.gain.value = volCurve(+$("cvol").value) / 0.69; clickBus.connect(master);
+  playing = true; setBtn();
+  const spq = secPerQuarter(), m = meter();
+  let start = ctx.currentTime + 0.12; countIn = [];
+  if (isOn("tCount")) {
+    const step = m.beatLen * spq, click = CLICKS[$("clickSound").value];
+    for (let k = 0; k < m.beats; k++) { click(start + k * step, k === 0 ? 2 : 1); countIn.push({ t: start + k * step, dur: step, txt: String(k + 1) }); }
+    start += m.beats * step;
+  }
+  const runPass = s => {
+    const end = schedulePass(s), loop = isOn("tLoop");
+    loopTimer = setTimeout(() => { if (!playing) return; if (loop) { countIn = []; runPass(end); } else stop(); }, Math.max(0, (end - ctx.currentTime + (loop ? -0.25 : 0.25)) * 1000));
+  };
+  runPass(start); tick();
+}
+let lastOn = null, lastWash = null, lastPh = null, lastSys = -1;
+function placePh(sys, x) {
+  const ph = LAYOUT[sys].svg.querySelector(".ph");
+  if (lastPh && lastPh !== ph) lastPh.setAttribute("hidden", "");
+  ph.removeAttribute("hidden"); ph.setAttribute("x1", f1(x)); ph.setAttribute("x2", f1(x)); lastPh = ph;
+  if (sys !== lastSys) {
+    lastSys = sys;
+    const r = LAYOUT[sys].svg.getBoundingClientRect();
+    if (r.bottom > innerHeight - 20 || r.top < 120) LAYOUT[sys].svg.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+}
+function setWash(n) {
+  const w = n ? LAYOUT[n.sys].svg.querySelector(`.wash[data-wash="${n.el.dataset.bar}"]`) : null;
+  if (w !== lastWash) { lastWash?.classList.remove("active"); w?.classList.add("active"); lastWash = w; }
+}
+function tick() {
+  if (!playing) return;
+  const now = ctx.currentTime - (ctx.outputLatency || 0);
+  let label = null, active = null;
+  for (const c of countIn) if (now >= c.t && now < c.t + c.dur) label = c.txt;
+  for (const e of events) if (now >= e.t && now < e.t + e.dur) { active = e; break; }
+  if (active) {
+    const n = active.n;
+    if (n.el !== lastOn) { lastOn?.classList.remove("on"); n.el.classList.add("on"); lastOn = n.el; setWash(n); }
+    const frac = Math.min(1, (now - active.t) / active.dur);
+    placePh(n.sys, n.hx - 8 + frac * (n.nx - n.hx));
+    label = n.rest ? "rest" : n.count;
+  } else if (label && events[0]) {
+    const n = events[0].n; placePh(n.sys, n.hx - 8); setWash(n);
+  }
+  countEl.textContent = label ?? " ";
+  countEl.classList.toggle("live", !!label);
+  raf = requestAnimationFrame(tick);
+}
+function stop() {
+  if (!playing) return;
+  playing = false; clearTimeout(loopTimer); cancelAnimationFrame(raf);
+  if (master) { const mg = master; mg.gain.setTargetAtTime(0, ctx.currentTime, 0.015); setTimeout(() => mg.disconnect(), 120); master = null; }
+  lastOn?.classList.remove("on"); lastOn = null; lastWash?.classList.remove("active"); lastWash = null;
+  lastPh?.setAttribute("hidden", ""); lastPh = null; lastSys = -1;
+  countEl.textContent = " "; countEl.classList.remove("live"); setBtn();
+}
+function setBtn() {
+  $("play").setAttribute("aria-label", playing ? "Stop" : "Play");
+  $("playIcon").setAttribute("d", playing ? "M4 4h12v12H4z" : "M5 2.5l12 7.5-12 7.5z");
+}
+
+/* ---------------- wiring ---------------- */
+$("play").addEventListener("click", () => playing ? stop() : play());
+$("bpm").addEventListener("input", e => { $("bpmOut").textContent = e.target.value; stop(); updateHead(); });
+function applyVol(save) {
+  $("volOut").textContent = $("vol").value;
+  if (outGain) outGain.gain.setTargetAtTime(volCurve(+$("vol").value), ctx.currentTime, 0.02);
+  if (clickBus && ctx) clickBus.gain.setTargetAtTime(volCurve(+$("cvol").value) / 0.69, ctx.currentTime, 0.02);
+  if (save) try { localStorage.setItem("rr-vol", JSON.stringify([+$("vol").value, +$("cvol").value])); } catch (e) {}
+}
+try { const v = JSON.parse(localStorage.getItem("rr-vol") || "null"); if (v) { $("vol").value = v[0]; $("cvol").value = v[1]; } } catch (e) {}
+applyVol(false);
+["vol", "cvol"].forEach(id => $(id).addEventListener("input", () => applyVol(true)));
+["tsNum", "tsDen"].forEach(id => $(id).addEventListener("change", render));
+["sound", "clickSound"].forEach(id => $(id).addEventListener("change", () => {
+  ensureCtx(); if (playing) return;
+  const g = ctx.createGain(); g.connect(outGain); g.connect(verb); master = g;
+  clickBus = ctx.createGain(); clickBus.gain.value = volCurve(+$("cvol").value) / 0.69; clickBus.connect(g);
+  id === "sound" ? VOICES[$("sound").value](ctx.currentTime + 0.03, 0.45) : CLICKS[$("clickSound").value](ctx.currentTime + 0.03, 2);
+  master = null; clickBus = null; setTimeout(() => g.disconnect(), 1500);
+}));
+["tMet", "tSub", "tCount", "tLoop"].forEach(id => $(id).addEventListener("click", e => { const b = e.currentTarget; b.setAttribute("aria-pressed", isOn(id) ? "false" : "true"); stop(); }));
+function applyView(save) {
+  document.body.classList.toggle("no-follow", !isOn("tFollow"));
+  document.body.classList.toggle("no-counts", !isOn("tCounts"));
+  if (save) try { localStorage.setItem("rr-view", JSON.stringify([isOn("tFollow"), isOn("tCounts")])); } catch (e) {}
+}
+try { const v = JSON.parse(localStorage.getItem("rr-view") || "null"); if (v) { $("tFollow").setAttribute("aria-pressed", String(v[0])); $("tCounts").setAttribute("aria-pressed", String(v[1])); } } catch (e) {}
+applyView(false);
+["tFollow", "tCounts"].forEach(id => $(id).addEventListener("click", e => { e.currentTarget.setAttribute("aria-pressed", isOn(id) ? "false" : "true"); applyView(true); }));
+["mDot", "mRest"].forEach(id => $(id).addEventListener("click", e => { const b = e.currentTarget; b.setAttribute("aria-pressed", isOn(id) ? "false" : "true"); buildCase(); }));
+$("aTie").addEventListener("click", toggleTie);
+$("aDel").addEventListener("click", deleteSel);
+$("aUndo").addEventListener("click", undo);
+$("aClear").addEventListener("click", () => { if (!model.bars.length) return; sel = null; setCurrent(-1); commit([]); });
+sysBox.addEventListener("click", e => {
+  stop();
+  const n = e.target.closest("g.note"), b = e.target.closest("[data-bar]");
+  if (n) sel = { bar: +n.dataset.bar, idx: +n.dataset.idx };
+  else if (b) sel = model.bars.length ? { bar: +b.dataset.bar, idx: null } : { bar: 0, idx: null };
+  else return;
+  draw(); updateActions();
+});
+$("newbar").addEventListener("click", () => { sel = { bar: model.bars.length, idx: null }; draw(); updateActions(); });
+let deb = 0;
+src.addEventListener("focus", () => history.push(src.value));
+src.addEventListener("input", () => { clearTimeout(deb); deb = setTimeout(() => { setCurrent(-1); render(); }, 160); });
+document.addEventListener("keydown", e => {
+  if (/TEXTAREA|INPUT|SELECT/.test(e.target.tagName)) return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.code === "Space") { if (e.target.tagName === "BUTTON" && e.target.id !== "play") return; e.preventDefault(); if (e.target.id !== "play") playing ? stop() : play(); return; }
+  const k = e.key.toLowerCase();
+  if (DUR[k]) { e.preventDefault(); insertTap(k); }
+  else if (k === "t") { e.preventDefault(); insertTap("trip"); }
+  else if (k === ".") $("mDot").click();
+  else if (k === "r") $("mRest").click();
+  else if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); deleteSel(); }
+  else if (e.key === "Escape") { sel = null; draw(); updateActions(); }
+});
+let lastW = 0;
+new ResizeObserver(() => { const w = sysBox.clientWidth; if (Math.abs(w - lastW) > 2) { lastW = w; stop(); draw(); } }).observe(sysBox);
+
+const index = $("index");
+function setCurrent(i) { current = i; index.querySelectorAll(".no[data-i]").forEach(b => b.setAttribute("aria-current", +b.dataset.i === i ? "true" : "false")); }
+function loadExercise(i) {
+  const p = EXERCISES[i];
+  if (src.value) history.push(src.value);
+  src.value = p.src; $("tsNum").value = p.ts[0]; $("tsDen").value = p.ts[1];
+  $("bpm").value = p.bpm; $("bpmOut").textContent = p.bpm;
+  sel = null; setCurrent(i); render();
+}
+SECTIONS.forEach(([title, names]) => {
+  const sct = document.createElement("div"); sct.className = "sect";
+  sct.innerHTML = `<i>${title}</i>`;
+  names.forEach(nm => {
+    const i = EXERCISES.findIndex(x => x.name === nm), p = EXERCISES[i];
+    const b = document.createElement("button"); b.type = "button"; b.className = "no"; b.dataset.i = i;
+    b.textContent = nm; b.title = `Exercise ${nm}, ${p.ts[0]}/${p.ts[1]}`;
+    b.addEventListener("click", () => loadExercise(i)); sct.appendChild(b);
+  });
+  index.appendChild(sct);
+});
+const blank = document.createElement("button"); blank.type = "button"; blank.className = "no blank"; blank.textContent = "blank page";
+blank.addEventListener("click", () => { if (src.value) history.push(src.value); src.value = ""; sel = null; setCurrent(-1); render(); });
+index.appendChild(blank);
+
+buildCase();
+loadExercise(0);
+history = [];
+updateActions();
+if (document.fonts) document.fonts.ready.then(() => draw());
+</script>
+</body></html>
