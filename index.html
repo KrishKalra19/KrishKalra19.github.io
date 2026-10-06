@@ -131,11 +131,12 @@ ul.list li strong { color: var(--ink); font-weight: 600; }
 .tl p { margin: 0; font-size: 14.5px; color: var(--muted); }
 
 /* music duo */
-.duo { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
 .card .body { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .card h3 { font-family: var(--display); font-size: 26px; font-weight: 600; margin: 0; }
 .card p { margin: 0; color: var(--muted); font-size: 15px; }
+.card p strong { color: var(--ink); font-weight: 600; }
 .card .links { margin-top: auto; padding-top: 8px; }
 .card img { aspect-ratio: 16/9; object-fit: cover; object-position: top; border-bottom: 1px solid var(--line); cursor: zoom-in; }
 .fret { position: relative; aspect-ratio: 16/9; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #3B2A1C, #2A1D13); overflow: hidden; }
@@ -368,32 +369,13 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
         </div>
       </article>
       <article class="card">
-        <div class="fret" aria-hidden="true">
-          <svg viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice">
-            <g stroke="#C9B48A" stroke-opacity=".55">
-              <line x1="-10" y1="40" x2="410" y2="40" stroke-width="1"/><line x1="-10" y1="69" x2="410" y2="69" stroke-width="1.2"/>
-              <line x1="-10" y1="98" x2="410" y2="98" stroke-width="1.5"/><line x1="-10" y1="127" x2="410" y2="127" stroke-width="1.9"/>
-              <line x1="-10" y1="156" x2="410" y2="156" stroke-width="2.3"/><line x1="-10" y1="185" x2="410" y2="185" stroke-width="2.7"/>
-            </g>
-            <g stroke="#8E8A84" stroke-width="3">
-              <line x1="30" y1="28" x2="30" y2="197"/><line x1="105" y1="28" x2="105" y2="197"/><line x1="175" y1="28" x2="175" y2="197"/>
-              <line x1="240" y1="28" x2="240" y2="197"/><line x1="300" y1="28" x2="300" y2="197"/><line x1="356" y1="28" x2="356" y2="197"/>
-            </g>
-            <g fill="#E8DCC0" fill-opacity=".35"><circle cx="207" cy="112" r="6"/><circle cx="328" cy="112" r="6"/></g>
-            <g font-family="JetBrains Mono, monospace" font-size="13" font-weight="600" text-anchor="middle">
-              <circle cx="140" cy="69" r="13" fill="#F28A4B"/><text x="140" y="74" fill="#2A1D13">C</text>
-              <circle cx="207" cy="127" r="13" fill="#F28A4B"/><text x="207" y="132" fill="#2A1D13">E</text>
-              <circle cx="270" cy="156" r="13" fill="#FFF7ED" fill-opacity=".9"/><text x="270" y="161" fill="#2A1D13">?</text>
-              <circle cx="68" cy="185" r="13" fill="#F28A4B"/><text x="68" y="190" fill="#2A1D13">G</text>
-            </g>
-          </svg>
-          <span class="chip status wip">In progress</span>
-        </div>
+        <img src="img/fret-explore.jpg" alt="Fret Driller Explore view: A minor pentatonic mapped across a 24-fret neck" data-cap="Fret Driller: A minor pentatonic across the whole neck, root notes in gold">
         <div class="body">
-          <span class="mono">Guitar · in development</span>
+          <span class="mono">Live · vanilla JS · Web Audio</span>
           <h3>Fret Driller</h3>
-          <p>A guitar practice tool. It starts with a fretboard note trainer that drills note names and positions across the neck, then adds scale and chord drills. More is coming.</p>
-          <div class="links"><span class="chip">Coming soon</span></div>
+          <p>Drills for learning the guitar fretboard. <strong>Find the note</strong> and <strong>Name the note</strong> quiz you on positions. <strong>Sequences</strong> has you play a melody in order, with an optional strict mode that checks the octave and keeps you in one position. <strong>Scale patterns</strong> covers 12 scales and modes in every key, played up, down, in thirds or in groups.</p>
+          <p><strong>Explore</strong> maps any scale or arpeggio across all 24 frets and can overlay a second scale for comparison. It tracks accuracy and speed for every fret and shows them as a heatmap. The note drills bring up your weak spots more often.</p>
+          <div class="links"><a class="btn primary" href="https://krishkalra19.github.io/fret-driller/" target="_blank" rel="noopener">Try it ↗</a><a class="btn" href="https://github.com/KrishKalra19/fret-driller" target="_blank" rel="noopener">Source</a></div>
         </div>
       </article>
     </div>
