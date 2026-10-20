@@ -1,0 +1,25 @@
+{
+  "generated": "2026-10-20T05:27:56.969Z",
+  "repos": {
+    "vivarium": {
+      "updated": "2026-10-12T23:39:41Z",
+      "commits30d": 7,
+      "latest": "Brains Stage 4a: evolvable brains for all herbivores"
+    },
+    "isfl-football-sim": {
+      "updated": "2026-08-27T20:51:00Z",
+      "commits30d": 0,
+      "latest": "Update README.md"
+    },
+    "fret-driller": {
+      "updated": "2026-10-16T06:18:28Z",
+      "commits30d": 5,
+      "latest": "Star Wars theme, Learn/Drill navigation and Star Wars quotes"
+    },
+    "rhythm-reader": {
+      "updated": "2026-10-07T04:57:01Z",
+      "commits30d": 2,
+      "latest": "Add live URL to README"
+    }
+  }
+}

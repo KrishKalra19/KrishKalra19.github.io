@@ -130,6 +130,11 @@ ul.list li strong { color: var(--ink); font-weight: 600; }
 .tl b { display: block; font-weight: 600; margin: 1px 0 2px; }
 .tl p { margin: 0; font-size: 14.5px; color: var(--muted); }
 
+/* live repo activity, filled from data/projects.json */
+.chip.live { font-family: var(--mono); font-size: 12px; }
+.live-line { font: 12.5px var(--mono); color: var(--muted); }
+.live-line i, .chip.live i { font-style: normal; color: var(--ink); }
+
 /* music duo */
 .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
@@ -288,6 +293,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <span class="chip">Solo</span>
       <span class="chip">JavaScript · Three.js · Node</span>
       <span class="chip">Sept 2026</span>
+      <span class="chip live" data-repo="vivarium" hidden></span>
     </div>
     <div class="pair">
       <div class="hero-shot"><img src="img/vivarium-3d.jpg" alt="Vivarium 3D view: low-poly Amazon rainforest with hundreds of animals" data-cap="Vivarium mode: an Amazon ecosystem of ~640 animals in 3D"></div>
@@ -330,6 +336,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <span class="chip">Solo</span>
       <span class="chip">Java → React · Vite</span>
       <span class="chip">2023 – 2026</span>
+      <span class="chip live" data-repo="isfl-football-sim" hidden></span>
     </div>
 
     <div class="cols" style="margin-top:8px">
@@ -363,6 +370,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
         <div class="body">
           <span class="mono">Live · single HTML file · Web Audio</span>
           <h3>Rhythm Reader</h3>
+          <span class="live-line" data-repo="rhythm-reader" hidden></span>
           <p>A rhythm-reading trainer styled like an engraved method book. Drag notes into bars, or type them in shorthand (<code>q q [e e e] h.</code>), then play them back. A red "pencil" follows each note with the count written underneath.</p>
           <p>It covers simple and compound metres, triplets, ties, dotted values and rests. It has five instrument voices, four metronome clicks, a count-in, subdivision and repeat.</p>
           <div class="links"><a class="btn primary" href="rhythm-reader/" target="_blank" rel="noopener">Try it ↗</a></div>
@@ -373,6 +381,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
         <div class="body">
           <span class="mono">Live · vanilla JS · Web Audio</span>
           <h3>Fret Driller</h3>
+          <span class="live-line" data-repo="fret-driller" hidden></span>
           <p>Drills for learning the guitar fretboard. <strong>Find the note</strong> and <strong>Name the note</strong> quiz you on positions. <strong>Sequences</strong> has you play a melody in order, with an optional strict mode that checks the octave and keeps you in one position. <strong>Scale patterns</strong> covers 12 scales and modes in every key, played up, down, in thirds or in groups.</p>
           <p><strong>Explore</strong> maps any scale or arpeggio across all 24 frets and can overlay a second scale for comparison. It tracks accuracy and speed for every fret and shows them as a heatmap. The note drills bring up your weak spots more often.</p>
           <div class="links"><a class="btn primary" href="https://krishkalra19.github.io/fret-driller/" target="_blank" rel="noopener">Try it ↗</a><a class="btn" href="https://github.com/KrishKalra19/fret-driller" target="_blank" rel="noopener">Source</a></div>
@@ -462,6 +471,19 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
   function close() { lb.classList.remove('open'); }
   lb.addEventListener('click', close);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+  // Live repo activity. Fails soft: labels stay hidden without data or when a repo has been quiet 30+ days.
+  fetch('data/projects.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    if (!d || !d.repos) return;
+    document.querySelectorAll('[data-repo]').forEach(function (el) {
+      var r = d.repos[el.dataset.repo]; if (!r) return;
+      var days = Math.floor((Date.now() - new Date(r.updated)) / 864e5); if (days > 30) return;
+      var when = days < 1 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago';
+      el.textContent = 'Updated ' + when + (r.commits30d > 1 ? ' · ' + r.commits30d + ' commits this month' : '');
+      el.title = 'Latest: ' + r.latest;
+      el.hidden = false;
+    });
+  }).catch(function () {});
 })();
 </script>
 </body>
