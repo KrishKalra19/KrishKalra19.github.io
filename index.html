@@ -303,7 +303,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
     <div class="meta">
       <span class="chip status">Live, plays in the browser</span>
       <span class="chip">Solo</span>
-      <span class="chip">JavaScript · Three.js · Node</span>
+      <span class="chip">JavaScript · Three.js · Node · Neuroevolution</span>
       <span class="chip">Sept – Oct 2026</span>
       <span class="chip live" data-repo="vivarium" hidden></span>
     </div>
@@ -321,7 +321,6 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
           <li><strong>Real ecology, not magic numbers.</strong> Metabolism follows Kleiber's law (mass<sup>0.75</sup>), grazing uses a Holling type II response, carcasses feed the soil, and territory pressure sets local carrying capacity.</li>
           <li><strong>Deterministic engine.</strong> It never calls <code>Math.random</code>, so a seed plus a roster always replays the same match. That one property is what makes the odds, the replays and headless balance testing in Node possible.</li>
           <li><strong>Balancing as an optimization problem.</strong> Fixed-step tuning oscillated, because a 10% edge roughly triples a species' win rate. I switched to a stochastic-approximation tuner and added a hidden "form" roll, which finally converged.</li>
-          <li><strong>Brains have to beat instinct.</strong> Herbivores can now carry small evolvable brains instead of fixed instincts. A mixed mode runs both in the same world as an A/B test. On the first run, evolved brains beat instinct for agoutis (65%) and for howlers and tapirs (54%), while capybaras still did better on instinct (63%).</li>
           <li><strong>Damping a boom-bust.</strong> Ocelots and harpy eagles hunted even when full, overshot, and wiped out the agoutis and howlers about every 90 seconds. Now pursuit predators only hunt below 65% energy, and every species survives a headless 480-second run.</li>
         </ul>
       </div>
@@ -337,6 +336,40 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
           <a class="btn primary" href="https://krishkalra19.github.io/vivarium/" target="_blank" rel="noopener">Play it ↗</a>
           <a class="btn" href="https://github.com/KrishKalra19/vivarium" target="_blank" rel="noopener">Source</a>
         </div>
+      </div>
+    </div>
+    <div class="cols" id="vivarium-brains">
+      <div>
+        <h3>Evolved brains</h3>
+        <p>Any animal can trade its hand-tuned instincts for a small neural network. A herbivore senses 16 things: where the nearest threat, food and kin are and how close, plus crowding, its own energy, age, whether it can breed, and two memory values. These feed 8 tanh hidden units, which drive 6 outputs: turn, throttle, head down to eat, breed, and the two memory values, which loop back as inputs. Predators get their own wiring with 19 inputs (their target and a backup prey, each with catch odds and size, rival predators, strike range) and decide when to lunge and when to switch prey.</p>
+        <p>The weights are the genome. They mutate at birth and selection does the rest. There's no gradient descent: a brain survives only if the animal carrying it eats, escapes and breeds.</p>
+        <div class="story">
+          <div class="beat">
+            <h4>A fair A/B test</h4>
+            <p>Mixed mode runs instinct and brain lineages side by side in one world, and each lineage has its own immigration floor, so a crash can't hand the other side a free win. Brains start wired to copy instinct plus noise, so the comparison starts at parity. After <strong>25 generations of evolution, evolved agouti brains took 86% of the agouti population</strong> when dropped back in against instinct. They bred at lower energy than instinct does. Across the other herbivores, brains won for howlers and tapirs, and capybaras still did better on instinct.</p>
+          </div>
+          <div class="beat">
+            <h4>Brains that over-hunt</h4>
+            <p>Predator brains learned to out-hunt instinct and wiped out the small prey within about 200 seconds. Rather than add a rule, I made hunting cost more for both lineages: a lunge burns 10× normal energy and a miss means a 15-second rest. Over-hunters starve, so restraint gets selected. I swept 11 settings on a seeded test harness. At the chosen one, <strong>4 of 5 seeds keep every prey species alive while brain predators hold 49–89% of the predators</strong>. Settings strong enough to pass the fifth starved the predators down to the immigration floor, so I took the 4 of 5.</p>
+          </div>
+          <div class="beat">
+            <h4>Instinct stays the control</h4>
+            <p>All of this is gated off in pure Instinct mode. A seeded Instinct run produces <strong>the same state hash before and after every brain change</strong>, so the original ecology is still there to compare against.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>Brains by the numbers</h3>
+        <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-top:0">
+          <div class="stat"><b>16 → 8 → 6</b><span>herbivore network: sensors, tanh hidden units, outputs (predators: 19 → 8 → 7)</span></div>
+          <div class="stat"><b>86%</b><span>agouti population held by evolved brains vs. instinct</span></div>
+          <div class="stat"><b>4 of 5</b><span>seeded test runs with no prey extinction and brains holding 49–89% of predators</span></div>
+          <div class="stat"><b>4.5 ms</b><span>sim step with all 8 species on brains, about 2,290 animals</span></div>
+        </div>
+        <ul class="list" style="margin-top:24px">
+          <li><strong>See inside it.</strong> The Specimen inspector shows any animal's network live, with its biggest changes from the starting wiring, and a guided tour explains what evolved.</li>
+          <li><strong>Save and replay.</strong> Gene banks export to JSON, so an evolved population can be loaded and challenged again later.</li>
+        </ul>
       </div>
     </div>
   </section>
@@ -424,6 +457,8 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
           <li><strong>Lean Vegas when they disagree.</strong> In the 170 held-out games where the two picked different winners, Vegas was right 53.5% of the time and the model 45.9%. So the model's job is to rank confidence and flag games, not to overrule the market.</li>
           <li><strong>Pregame roster ratings.</strong> Each player is rated by recency-weighted snap share, with a draft-pick prior for rookies, then summed over the active roster before kickoff. That's how injuries and roster turnover reach the model. Starting-QB features carried the most unique value.</li>
           <li><strong>Overfitting was the main problem.</strong> With about 250 features and only 2,000–3,000 training games, the first networks overfit within about five epochs. An L2 penalty and input dropout stabilized them, and after that the MLP tied logistic regression: the signal is mostly linear.</li>
+          <li><strong>Runs itself every week.</strong> Scheduled jobs pull fresh nflverse data, rebuild the roster ratings, retrain all five models and publish new picks on Sunday, Tuesday and Thursday mornings, plus a Friday-evening run after the final injury reports. Each prediction freezes at kickoff, and the model only trains on weeks before the one it's predicting, so the live record can't be quietly revised.</li>
+          <li><strong>Me vs. the model vs. Vegas.</strong> I enter my own probability for every game on a private pick sheet. After kickoff, the public page grades my picks next to the model's and Vegas's, so I find out whether my gut adds anything.</li>
           <li><strong>Scored once.</strong> Models were tuned on 2018–21 and evaluated a single time on 2022–26. Dev and held-out log-loss matched (0.623 vs. 0.624), so model selection didn't overfit.</li>
         </ul>
       </div>
