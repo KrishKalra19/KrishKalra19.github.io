@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Krish Kalra</title>
-<meta name="description" content="Krish Kalra — Boston College CS '27. Games, simulations and tools: Asteroid Miner, Vivarium, ISFL Football GM, Rhythm Reader.">
+<meta name="description" content="Krish Kalra — Boston College CS '27. Games, simulations and tools: Asteroid Miner, Vivarium, ISFL Football GM, Rhythm Reader, NFL Predictor.">
 <meta property="og:title" content="Krish Kalra">
 <meta property="og:description" content="Games, simulations and tools — and the calls behind them.">
 <meta property="og:image" content="img/cover.jpg">
@@ -73,7 +73,7 @@ nav a.link:hover { color: var(--ink); }
 .hero .actions { display: flex; flex-wrap: wrap; gap: 10px; }
 
 /* index strip */
-.index { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin: 8px 0 96px; }
+.index { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin: 8px 0 96px; }
 .index a { background: var(--surface); padding: 18px 20px; text-decoration: none; transition: background .15s; }
 .index a:hover { background: var(--accent-soft); }
 .index b { display: block; font-family: var(--display); font-weight: 600; font-size: 18px; margin: 4px 0 2px; }
@@ -135,6 +135,15 @@ ul.list li strong { color: var(--ink); font-weight: 600; }
 .live-line { font: 12.5px var(--mono); color: var(--muted); }
 .live-line i, .chip.live i { font-style: normal; color: var(--ink); }
 
+/* calibration table */
+table.calib { width: 100%; border-collapse: collapse; font-size: 14px; margin: 24px 0 0; }
+table.calib caption { font: 600 13px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); text-align: left; margin-bottom: 10px; }
+table.calib th, table.calib td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+table.calib th:first-child, table.calib td:first-child { text-align: left; }
+table.calib th { font: 500 12px var(--mono); color: var(--muted); }
+table.calib td { color: var(--muted); font-variant-numeric: tabular-nums; }
+table.calib td:last-child { color: var(--ink); font-weight: 600; }
+
 /* music duo */
 .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
@@ -177,6 +186,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
 
 @media (max-width: 860px) {
   .index { grid-template-columns: 1fr 1fr; }
+  .index a:last-child:nth-child(odd) { grid-column: span 2; }
   .cols, .about, .duo, .pair { grid-template-columns: 1fr; gap: 32px; }
   .gallery { grid-template-columns: 1fr 1fr; }
   .exp-row { grid-template-columns: 1fr; gap: 6px; }
@@ -186,6 +196,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
   .wrap { padding: 0 16px; }
   .hero { padding: 56px 0 40px; }
   .index { grid-template-columns: 1fr; }
+  .index a:last-child:nth-child(odd) { grid-column: auto; }
   .stat-row { grid-template-columns: 1fr; }
   nav .wrap { gap: 14px; }
   .facts div { grid-template-columns: 1fr; gap: 2px; }
@@ -225,9 +236,10 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
 
   <div class="index" id="work">
     <a href="#asteroid-miner"><span class="mono">01 · Roblox · Team lead</span><b>Asteroid Miner</b><span class="d">A multiplayer space-mining game, and a lesson in cutting scope.</span></a>
-    <a href="#vivarium"><span class="mono">02 · Browser sim</span><b>Vivarium</b><span class="d">An evolving jungle ecosystem, plus a sixteen-animal arena.</span></a>
+    <a href="#vivarium"><span class="mono">02 · Browser sim</span><b>Vivarium</b><span class="d">An evolving jungle ecosystem with evolvable brains, plus a sixteen-animal arena.</span></a>
     <a href="#football"><span class="mono">03 · Java → React</span><b>ISFL Football GM</b><span class="d">A franchise-mode GM game I've rebuilt over three years.</span></a>
     <a href="#music"><span class="mono">04 · Music tools</span><b>Rhythm Reader &amp; Fret Driller</b><span class="d">Practice tools I built for my own playing.</span></a>
+    <a href="#nfl"><span class="mono">05 · Python · ML</span><b>NFL Predictor</b><span class="d">Win probabilities for every game, measured against Vegas.</span></a>
   </div>
 
   <!-- ─────────── 01 ASTEROID MINER ─────────── -->
@@ -292,7 +304,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <span class="chip status">Live, plays in the browser</span>
       <span class="chip">Solo</span>
       <span class="chip">JavaScript · Three.js · Node</span>
-      <span class="chip">Sept 2026</span>
+      <span class="chip">Sept – Oct 2026</span>
       <span class="chip live" data-repo="vivarium" hidden></span>
     </div>
     <div class="pair">
@@ -304,11 +316,13 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <div>
         <h3>Two modes, one engine</h3>
         <p><strong>Vivarium</strong> is an open-ended Amazon ecosystem with eight species. Every animal is an individual with a heritable four-trait genome (mass, speed, sense, metabolism), and you can watch selection shift those traits over generations.</p>
-        <p><strong>Arena</strong> drops sixteen named animals into a shrinking ring. Before each match, it simulates 200 matches of that exact roster to give you the odds. You pick a winner, and afterwards a "Play of the Game" replays the most surprising moment.</p>
+        <p><strong>Arena</strong> drops sixteen named animals into a shrinking ring. Before each match, it simulates 200 matches of that exact roster to give you the odds. You pick a winner, and afterwards a "Play of the Game" replays the most surprising moment. The fighters are cartoon animals with faces and signature moves, and the Arena now has touch controls and a phone layout.</p>
         <ul class="list">
           <li><strong>Real ecology, not magic numbers.</strong> Metabolism follows Kleiber's law (mass<sup>0.75</sup>), grazing uses a Holling type II response, carcasses feed the soil, and territory pressure sets local carrying capacity.</li>
           <li><strong>Deterministic engine.</strong> It never calls <code>Math.random</code>, so a seed plus a roster always replays the same match. That one property is what makes the odds, the replays and headless balance testing in Node possible.</li>
           <li><strong>Balancing as an optimization problem.</strong> Fixed-step tuning oscillated, because a 10% edge roughly triples a species' win rate. I switched to a stochastic-approximation tuner and added a hidden "form" roll, which finally converged.</li>
+          <li><strong>Brains have to beat instinct.</strong> Herbivores can now carry small evolvable brains instead of fixed instincts. A mixed mode runs both in the same world as an A/B test. On the first run, evolved brains beat instinct for agoutis (65%) and for howlers and tapirs (54%), while capybaras still did better on instinct (63%).</li>
+          <li><strong>Damping a boom-bust.</strong> Ocelots and harpy eagles hunted even when full, overshot, and wiped out the agoutis and howlers about every 90 seconds. Now pursuit predators only hunt below 65% energy, and every species survives a headless 480-second run.</li>
         </ul>
       </div>
       <div>
@@ -373,7 +387,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
           <span class="live-line" data-repo="rhythm-reader" hidden></span>
           <p>A rhythm-reading trainer styled like an engraved method book. Drag notes into bars, or type them in shorthand (<code>q q [e e e] h.</code>), then play them back. A red "pencil" follows each note with the count written underneath.</p>
           <p>It covers simple and compound metres, triplets, ties, dotted values and rests. It has five instrument voices, four metronome clicks, a count-in, subdivision and repeat.</p>
-          <div class="links"><a class="btn primary" href="rhythm-reader/" target="_blank" rel="noopener">Try it ↗</a></div>
+          <div class="links"><a class="btn primary" href="rhythm-reader/" target="_blank" rel="noopener">Try it ↗</a><a class="btn" href="https://github.com/KrishKalra19/rhythm-reader" target="_blank" rel="noopener">Source</a></div>
         </div>
       </article>
       <article class="card">
@@ -384,15 +398,63 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
           <span class="live-line" data-repo="fret-driller" hidden></span>
           <p>Drills for learning the guitar fretboard. <strong>Find the note</strong> and <strong>Name the note</strong> quiz you on positions. <strong>Sequences</strong> has you play a melody in order, with an optional strict mode that checks the octave and keeps you in one position. <strong>Scale patterns</strong> covers 12 scales and modes in every key, played up, down, in thirds or in groups.</p>
           <p><strong>Explore</strong> maps any scale or arpeggio across all 24 frets and can overlay a second scale for comparison. It tracks accuracy and speed for every fret and shows them as a heatmap. The note drills bring up your weak spots more often.</p>
+          <p>It now has a <strong>bass mode</strong>: a 4-string neck with its own stats and best times. The menu is split into <strong>Learn</strong>, which opens on the fretboard map, and <strong>Drill</strong>. Ranks come from lifetime correct answers on each instrument, and the whole app has a Jedi/Sith theme.</p>
           <div class="links"><a class="btn primary" href="https://krishkalra19.github.io/fret-driller/" target="_blank" rel="noopener">Try it ↗</a><a class="btn" href="https://github.com/KrishKalra19/fret-driller" target="_blank" rel="noopener">Source</a></div>
         </div>
       </article>
     </div>
   </section>
 
+  <!-- ─────────── 05 NFL PREDICTOR ─────────── -->
+  <section class="project" id="nfl">
+    <div class="phead"><span class="num">05</span><h2>NFL Predictor</h2></div>
+    <p class="tagline">Win probabilities for every game, built only on what's known before kickoff.</p>
+    <div class="meta">
+      <span class="chip status">Live, new picks each week</span>
+      <span class="chip">Python · PyTorch · scikit-learn · pandas</span>
+      <span class="chip">Oct 2026</span>
+    </div>
+
+    <div class="cols" style="margin-top:8px">
+      <div>
+        <h3>The model, and the benchmark it doesn't beat</h3>
+        <p>A five-model ensemble (logistic regression, ridge margin, gradient boosting and two neural networks) gives each game a win probability. Every feature uses only data from before kickoff. <strong>Vegas lines are a benchmark, never an input.</strong></p>
+        <p>On 1,218 held-out games (2022 through 2026 week 5) it picked 66.3% of winners. That's 2.4 points better than Elo and 11 better than always picking the home team, but about a point behind Vegas, which it beat only in 2024 (71.9% vs. 70.5%).</p>
+        <ul class="list">
+          <li><strong>Lean Vegas when they disagree.</strong> In the 170 held-out games where the two picked different winners, Vegas was right 53.5% of the time and the model 45.9%. So the model's job is to rank confidence and flag games, not to overrule the market.</li>
+          <li><strong>Pregame roster ratings.</strong> Each player is rated by recency-weighted snap share, with a draft-pick prior for rookies, then summed over the active roster before kickoff. That's how injuries and roster turnover reach the model. Starting-QB features carried the most unique value.</li>
+          <li><strong>Overfitting was the main problem.</strong> With about 250 features and only 2,000–3,000 training games, the first networks overfit within about five epochs. An L2 penalty and input dropout stabilized them, and after that the MLP tied logistic regression: the signal is mostly linear.</li>
+          <li><strong>Scored once.</strong> Models were tuned on 2018–21 and evaluated a single time on 2022–26. Dev and held-out log-loss matched (0.623 vs. 0.624), so model selection didn't overfit.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Held-out results</h3>
+        <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-top:0">
+          <div class="stat"><b>66.3%</b><span>winners picked (Vegas 67.4%, Elo 63.9%, home team 55.0%)</span></div>
+          <div class="stat"><b>0.624</b><span>log-loss (Vegas 0.610, Elo 0.635, home team 0.688)</span></div>
+        </div>
+        <table class="calib">
+          <caption>Confidence means what it says</caption>
+          <thead><tr><th>Model confidence</th><th>Games</th><th>Picked right</th></tr></thead>
+          <tbody>
+            <tr><td>50–55%</td><td>242</td><td>54.5%</td></tr>
+            <tr><td>55–60%</td><td>261</td><td>63.7%</td></tr>
+            <tr><td>60–65%</td><td>216</td><td>63.7%</td></tr>
+            <tr><td>65–70%</td><td>168</td><td>68.3%</td></tr>
+            <tr><td>70–75%</td><td>150</td><td>73.3%</td></tr>
+            <tr><td>75%+</td><td>181</td><td>81.2%</td></tr>
+          </tbody>
+        </table>
+        <div class="links" style="margin-top:24px">
+          <a class="btn primary" href="https://krishkalra19.github.io/nfl-predictor/" target="_blank" rel="noopener">This week's picks ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ─────────── EXPERIENCE ─────────── -->
   <section id="experience">
-    <div class="section-title"><span class="num">05</span><h2>Experience</h2></div>
+    <div class="section-title"><span class="num">06</span><h2>Experience</h2></div>
     <div class="exp">
       <div class="exp-row">
         <div class="when">Jun 2026 – present</div>
@@ -414,7 +476,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
 
   <!-- ─────────── ABOUT ─────────── -->
   <section id="about">
-    <div class="section-title"><span class="num">06</span><h2>About</h2></div>
+    <div class="section-title"><span class="num">07</span><h2>About</h2></div>
     <div class="about">
       <div>
         <p>I'm from Clarksville, Maryland, and I'm a senior at <strong>Boston College</strong> studying computer science, with minors in <strong>finance</strong> and <strong>philosophy</strong>. Before BC, I went to Gilman School in Baltimore, where I was an American Computer Science League finalist.</p>
