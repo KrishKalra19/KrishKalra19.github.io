@@ -247,7 +247,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
     <div class="phead"><span class="num">01</span><h2>Asteroid Miner</h2></div>
     <p class="tagline">Sea of Thieves, but in space.</p>
     <div class="meta">
-      <span class="chip status">Launching soon on Roblox</span>
+      <span class="chip status">In launch prep on Roblox</span>
       <span class="chip">Product lead · 4-person team</span>
       <span class="chip">Luau · Roblox Studio · Rojo · Git</span>
       <span class="chip">Summer 2026 – present</span>
@@ -271,15 +271,25 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
             <h4>Fair across progression</h4>
             <p>The old pirate-raid penalty was a flat 3,000 credits: <strong>100% of a mid-game player's net worth, and 3% of a late-game player's</strong>. I replaced it with cargo-only loss, so you can lose the run but never the bank. Running dry far from home works the same way: a free emergency recall that costs your cargo.</p>
           </div>
+          <div class="beat">
+            <h4>Onboarding last, on purpose</h4>
+            <p>Building a tutorial for a loop that isn't fun yet means building it twice, so onboarding waited until the run loop worked. It's now a <strong>guided first run in four beats: get to your ship, fill the hold, bank it, spend it</strong>, and then it stops mid-sentence and leaves the next decision to you. Each beat is a marker, never a gate, and nothing takes the camera, because Roblox players leave in the first thirty seconds. The success metric isn't "finished the tutorial." It's <strong>"started a second run voluntarily."</strong></p>
+          </div>
+          <div class="beat">
+            <h4>Decisions that don't rot</h4>
+            <p>Our planning doc mixed decisions with progress checkboxes, and <strong>seven of those checkboxes went stale in three weeks</strong>. Twice, someone rebuilt code that had already shipped. I replaced it with a design record of <strong>20-plus numbered, locked decisions</strong> that code and Slack threads cite by number. Status now lives only in the code and git, and a script fails if anyone adds progress markers back in.</p>
+          </div>
         </div>
       </div>
       <div>
         <h3>Engineering</h3>
         <ul class="list">
-          <li><strong>Server-authoritative fuel.</strong> Both free and paid refueling run entirely on the server, which closed a client-side spoofing exploit.</li>
+          <li><strong>Server-authoritative fuel.</strong> Both free and paid refueling run entirely on the server, which closed a client-side spoofing exploit. I also caught a manual-refuel setting that would have left ships <strong>permanently unable to refuel</strong>, and kept it off before it shipped.</li>
+          <li><strong>Fuel as a clock.</strong> The HUD shows distance home against estimated range, which calibrates itself from your real fuel burn, and turns red as the margin closes.</li>
+          <li><strong>A soft-lock nobody saw.</strong> Falling off the carrier landed players on 982 hidden backup parts, a ghost base with no spawn and no ship, so they never died and never respawned. I fixed it without deleting anything. That pass also cut shadow-casting parts from 79% to 40%, with no visible change.</li>
+          <li><strong>One HUD, measured.</strong> I moved nine separate screen UIs under one owner and docked seven floating ability buttons into one bar. A collision checker run at four screen sizes found 21 overlapping elements, including two I had just created.</li>
           <li><strong>Four docking bugs, verified live.</strong> A velocity-reset trap, floor clipping on recall, over-anchoring 78 ship parts, and a network-ownership race on the seat.</li>
-          <li><strong>Shipped, then cut, my own UI.</strong> I replaced 84 per-slot interaction prompts with one kiosk after seeing the clutter in play.</li>
-          <li><strong>AI-native team workflow.</strong> Each teammate runs a Claude Code session against a shared repo synced to Studio via Rojo. Sessions write daily update files, and a bot posts them to our standup channel.</li>
+          <li><strong>AI-native team workflow.</strong> Each teammate runs a Claude Code session against a shared repo synced to Studio via Rojo. Sessions write daily update files, and a bot posts them to our standup channel. Our build scripts refuse to run against a teammate's live place, so an automated pass can't damage someone else's game.</li>
           <li><strong>Playtest-driven.</strong> We ran competitive playtests of comparable Roblox tycoon games to set priorities, and I keep a written log of every call and why we made it.</li>
         </ul>
         <div class="links">
@@ -308,7 +318,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <span class="chip live" data-repo="vivarium" hidden></span>
     </div>
     <div class="pair">
-      <div class="hero-shot"><img src="img/vivarium-3d.jpg" alt="Vivarium 3D view: low-poly Amazon rainforest with hundreds of animals" data-cap="Vivarium mode: an Amazon ecosystem of ~640 animals in 3D"></div>
+      <div class="hero-shot"><img src="img/viv-brains3d.jpg" alt="Vivarium 3D view beside the Evolved Brains panel comparing brain and instinct agoutis" data-cap="Mixed mode: brain and instinct lineages side by side, with live lineage and predation charts"></div>
       <div class="hero-shot"><img src="img/arena-lobby.jpg" alt="Arena lobby: sixteen named animal contestants" data-cap="Arena mode: sixteen enter, one survives"></div>
     </div>
 
@@ -424,7 +434,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
         </div>
       </article>
       <article class="card">
-        <img src="img/fret-explore.jpg" alt="Fret Driller Explore view: A minor pentatonic mapped across a 24-fret neck" data-cap="Fret Driller: A minor pentatonic across the whole neck, root notes in gold">
+        <img src="img/fret-jam.jpg" alt="Fret Driller Jam page: C chord tones lit by degree across the neck, next chord D7" data-cap="Jam: chord tones by degree (root, 3rd, 5th) over a backing band, with the next chord previewed">
         <div class="body">
           <span class="mono">Live · vanilla JS · Web Audio</span>
           <h3>Fret Driller</h3>

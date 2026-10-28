@@ -31,3 +31,9 @@ Each update records where every source project stood, so the next update only lo
 - Asteroid Miner: no commits since the last update; not launched yet, no player numbers.
 - Experience: added Computer Networks TA and Complex Problems student leader roles, set the Northrop SWE internship to Jun–Aug 2026, added the setup-time result. All from the current resume.
 - resume.pdf: replaced with the current resume (Google Doc "Resume 1.7", exported 2026-10-25).
+
+## 2026-10-28
+
+- Asteroid Miner: `00c3a94` (2026-10-28) on `krish/overnight-2026-09-30`. Added two product beats (onboarding, design record) and refreshed engineering from updates 10-06 to 10-13 and DESIGN.md. Still not launched, no player numbers. Game screenshots are still from August.
+- Vivarium: `f794f0e`. Text already current as of 10-20; swapped in a Mixed-mode screenshot showing brains.
+- Fret Driller: `6e6fb3e`. Jam text already added 10-25; swapped in a Jam screenshot with the new theme.
