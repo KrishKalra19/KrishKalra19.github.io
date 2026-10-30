@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-26T17:26:12.797Z",
+  "generated": "2026-10-30T17:02:53.199Z",
   "repos": {
     "vivarium": {
       "updated": "2026-10-20T09:03:50Z",
@@ -12,9 +12,9 @@
       "latest": "Update README.md"
     },
     "fret-driller": {
-      "updated": "2026-10-25T18:50:44Z",
-      "commits30d": 6,
-      "latest": "Add Jam page with backing band, chord-tone mode and clickable pattern strip"
+      "updated": "2026-10-30T05:01:03Z",
+      "commits30d": 7,
+      "latest": "Jam: keys, key cycle, 23 tracks, 12 grooves, chord sounds, My tracks"
     },
     "rhythm-reader": {
       "updated": "2026-10-07T04:57:01Z",
