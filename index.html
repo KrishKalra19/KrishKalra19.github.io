@@ -236,7 +236,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
 
   <div class="index" id="work">
     <a href="#asteroid-miner"><span class="mono">01 · Roblox · Team lead</span><b>Asteroid Miner</b><span class="d">A multiplayer space-mining game, and a lesson in cutting scope.</span></a>
-    <a href="#vivarium"><span class="mono">02 · Browser sim</span><b>Vivarium</b><span class="d">An evolving jungle ecosystem with evolvable brains, plus a sixteen-animal arena.</span></a>
+    <a href="#vivarium"><span class="mono">02 · Browser sim</span><b>Vivarium</b><span class="d">An evolving jungle ecosystem with evolvable brains, now a research and teaching instrument, plus a sixteen-animal arena.</span></a>
     <a href="#football"><span class="mono">03 · Java → React</span><b>ISFL Football GM</b><span class="d">A franchise-mode GM game I've rebuilt over three years.</span></a>
     <a href="#music"><span class="mono">04 · Music tools</span><b>Rhythm Reader &amp; Fret Driller</b><span class="d">Practice tools I built for my own playing.</span></a>
     <a href="#nfl"><span class="mono">05 · Python · ML</span><b>NFL Predictor</b><span class="d">Win probabilities for every game, measured against Vegas.</span></a>
@@ -314,7 +314,7 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <span class="chip status">Live, plays in the browser</span>
       <span class="chip">Solo</span>
       <span class="chip">JavaScript · Three.js · Node · Neuroevolution</span>
-      <span class="chip">Sept – Oct 2026</span>
+      <span class="chip">Sept – Nov 2026</span>
       <span class="chip live" data-repo="vivarium" hidden></span>
     </div>
     <div class="pair">
@@ -379,6 +379,42 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
         <ul class="list" style="margin-top:24px">
           <li><strong>See inside it.</strong> The Specimen inspector shows any animal's network live, with its biggest changes from the starting wiring, and a guided tour explains what evolved.</li>
           <li><strong>Save and replay.</strong> Gene banks export to JSON, so an evolved population can be loaded and challenged again later.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cols" id="vivarium-research">
+      <div>
+        <h3>From game to research instrument</h3>
+        <p class="mono">Nov 2026 · on a branch, not in the live build yet</p>
+        <p>Next I turned Vivarium into a tool for studying behaviour. Runs now replay bit-for-bit from a seed. Every animal's life, behaviour and feeding bouts can be logged. Experiments run headless in Node, with controls and paired seeds. Every new switch is off by default, and a fingerprint check confirms that default runs haven't changed by a single bit.</p>
+        <div class="story">
+          <div class="beat">
+            <h4>Do evolved foragers follow the marginal value theorem?</h4>
+            <p>Foraging theory predicts that an animal should leave a patch earlier, with more food still on it, when the habitat around it is rich. <strong>The evolved brains do this, in every species</strong>: paired over six seeds, every 95% interval for rich-minus-poor excludes zero. A transplant test showed the response is plastic, not fixed. An unevolved control shows little of it, so it was selected for. They actively walk away from food that's still there. What tells them a habitat is rich is still open: visible food quality <em>can</em> drive leaving, but hiding it doesn't remove the effect.</p>
+          </div>
+          <div class="beat">
+            <h4>A null result I kept</h4>
+            <p>Real prey scan less in bigger groups (the "many-eyes" effect). After seven pilots plus evolvability and selection tests, <strong>it never evolves here</strong>. These networks don't evolve proactive scanning at all. Vigilance evolves <em>down</em>, because every second with the head up costs food.</p>
+          </div>
+          <div class="beat">
+            <h4>Every trap became a lesson</h4>
+            <p>Counting walking as vigilance faked a many-eyes effect, and a reversed one in capybaras. Immortal-time bias made a little vigilance look optimal. Group size was confounded with food. I caught each one before it reached a conclusion, and two of them are now classroom case studies built on the simulation's own data.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3>A field-methods classroom</h3>
+        <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-top:0">
+          <div class="stat"><b>3</b><span>field methods, each scored against ground truth no real field site has</span></div>
+          <div class="stat"><b>~45</b><span>experiment cycles over two days, each logged with its result</span></div>
+          <div class="stat"><b>6</b><span>paired seeds behind the foraging result</span></div>
+          <div class="stat"><b>0</b><span>bits changed in default runs (fingerprint-checked after every change)</span></div>
+        </div>
+        <ul class="list" style="margin-top:24px">
+          <li><strong>The Field tab.</strong> Students practice <strong>focal sampling</strong> (graded with Cohen's κ and a confusion table that separates observer error from sampling error), <strong>scan sampling</strong>, and <strong>feeding trays</strong> that measure giving-up densities in rich and poor habitat, with a prediction made before the data comes in.</li>
+          <li><strong>One link per class.</strong> A seeded class link gives every student the same world. A fixed-step clock keeps linked worlds identical across machines, and CSV exports let a class pool its data.</li>
+          <li><strong>Ready to teach.</strong> One-page handouts with instructor answers for each method, plus an instructor guide.</li>
+          <li><strong>Two sessions, one branch.</strong> A cloud Claude Code session ran the experiments while a local one built the classroom UI. A file-ownership table and a shared log kept them out of each other's way.</li>
         </ul>
       </div>
     </div>
