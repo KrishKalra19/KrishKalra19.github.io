@@ -442,7 +442,8 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
           <p>Drills for learning the guitar fretboard. <strong>Find the note</strong> and <strong>Name the note</strong> quiz you on positions. <strong>Sequences</strong> has you play a melody in order, with an optional strict mode that checks the octave and keeps you in one position. <strong>Scale patterns</strong> covers 12 scales and modes in every key, played up, down, in thirds or in groups.</p>
           <p><strong>Explore</strong> maps any scale or arpeggio across all 24 frets and can overlay a second scale for comparison. It tracks accuracy and speed for every fret and shows them as a heatmap. The note drills bring up your weak spots more often.</p>
           <p>It now has a <strong>bass mode</strong>: a 4-string neck with its own stats and best times. The menu is split into <strong>Learn</strong>, which opens on the fretboard map, and <strong>Drill</strong>. Ranks come from lifetime correct answers on each instrument, and the whole app has a Jedi/Sith theme.</p>
-          <p>The newest page is <strong>Jam</strong>: a synthesized backing band (drums, bass and keys, five grooves) loops a chord progression you can edit, while the fretboard lights up the current chord's tones by degree and previews the next chord. A chord parser handles common jazz and pop symbols with correct spelling.</p>
+          <p>The newest page is <strong>Jam</strong>: a synthesized backing band loops a chord progression you can edit, while the fretboard lights up the current chord's tones by degree and previews the next chord. A chord parser handles common jazz and pop symbols with correct spelling.</p>
+          <p>Jam now has 23 blues, jazz and rock/pop tracks, 12 grooves (including 12/8 blues, reggae and a 3/4 waltz) and five chord sounds, from e-piano to strummed guitar. The presets are written in Roman numerals, so any track plays in any key, and a <strong>key cycle</strong> can move it around the circle of fourths every few loops. That turns one progression into practice in all twelve keys. Custom progressions save to <strong>My tracks</strong>.</p>
           <div class="links"><a class="btn primary" href="https://krishkalra19.github.io/fret-driller/" target="_blank" rel="noopener">Try it ↗</a><a class="btn" href="https://github.com/KrishKalra19/fret-driller" target="_blank" rel="noopener">Source</a></div>
         </div>
       </article>
@@ -463,20 +464,22 @@ footer .small { margin-top: 48px; font-size: 13px; color: var(--faint); }
       <div>
         <h3>The model, and the benchmark it doesn't beat</h3>
         <p>A five-model ensemble (logistic regression, ridge margin, gradient boosting and two neural networks) gives each game a win probability. Every feature uses only data from before kickoff. <strong>Vegas lines are a benchmark, never an input.</strong></p>
-        <p>On 1,218 held-out games (2022 through 2026 week 5) it picked 66.3% of winners. That's 2.4 points better than Elo and 11 better than always picking the home team, but about a point behind Vegas, which it beat only in 2024 (71.9% vs. 70.5%).</p>
+        <p>On 1,218 held-out games (2022 through 2026 week 5) it picked 66.2% of winners. That's 2.3 points better than Elo and 11 better than always picking the home team, but about a point behind Vegas, which it beat only in 2024 (71.9% vs. 70.5%).</p>
         <ul class="list">
           <li><strong>Lean Vegas when they disagree.</strong> In the 170 held-out games where the two picked different winners, Vegas was right 53.5% of the time and the model 45.9%. So the model's job is to rank confidence and flag games, not to overrule the market.</li>
           <li><strong>Pregame roster ratings.</strong> Each player is rated by recency-weighted snap share, with a draft-pick prior for rookies, then summed over the active roster before kickoff. That's how injuries and roster turnover reach the model. Starting-QB features carried the most unique value.</li>
           <li><strong>Overfitting was the main problem.</strong> With about 250 features and only 2,000–3,000 training games, the first networks overfit within about five epochs. An L2 penalty and input dropout stabilized them, and after that the MLP tied logistic regression: the signal is mostly linear.</li>
           <li><strong>Runs itself every week.</strong> Scheduled jobs pull fresh nflverse data, rebuild the roster ratings, retrain all five models and publish new picks on Sunday, Tuesday and Thursday mornings, plus a Friday-evening run after the final injury reports. Each prediction freezes at kickoff, and the model only trains on weeks before the one it's predicting, so the live record can't be quietly revised.</li>
-          <li><strong>Me vs. the model vs. Vegas.</strong> I enter my own probability for every game on a private pick sheet. After kickoff, the public page grades my picks next to the model's and Vegas's, so I find out whether my gut adds anything.</li>
+          <li><strong>Me vs. the model vs. Vegas.</strong> I file my own probability for every game before kickoff, and the public page grades my picks next to the model's and Vegas's, so I find out whether my gut adds anything. Others can now sign in and file picks on the site too, and a leaderboard grades each person's log-loss against the model on the same games.</li>
+          <li><strong>Ratings and playoff odds.</strong> A Kalman filter rates every team with an uncertainty band, and 10,000 simulations of the rest of the season give playoff, division and #1-seed odds on a weekly rankings page.</li>
+          <li><strong>Tests that catch leaks.</strong> A leakage test suite checks that a week's features come out identical whether or not later results exist. It caught two league-wide averages that had been computed over the whole dataset, future seasons included. Both now use only earlier games. Re-scored, the held-out numbers barely moved (66.3% to 66.2%, log-loss 0.6242 to 0.6244), and the corrected figures are the ones shown here.</li>
           <li><strong>Scored once.</strong> Models were tuned on 2018–21 and evaluated a single time on 2022–26. Dev and held-out log-loss matched (0.623 vs. 0.624), so model selection didn't overfit.</li>
         </ul>
       </div>
       <div>
         <h3>Held-out results</h3>
         <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-top:0">
-          <div class="stat"><b>66.3%</b><span>winners picked (Vegas 67.4%, Elo 63.9%, home team 55.0%)</span></div>
+          <div class="stat"><b>66.2%</b><span>winners picked (Vegas 67.4%, Elo 63.9%, home team 55.0%)</span></div>
           <div class="stat"><b>0.624</b><span>log-loss (Vegas 0.610, Elo 0.635, home team 0.688)</span></div>
         </div>
         <table class="calib">

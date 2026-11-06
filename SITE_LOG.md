@@ -37,3 +37,13 @@ Each update records where every source project stood, so the next update only lo
 - Asteroid Miner: `00c3a94` (2026-10-28) on `krish/overnight-2026-09-30`. Added two product beats (onboarding, design record) and refreshed engineering from updates 10-06 to 10-13 and DESIGN.md. Still not launched, no player numbers. Game screenshots are still from August.
 - Vivarium: `f794f0e`. Text already current as of 10-20; swapped in a Mixed-mode screenshot showing brains.
 - Fret Driller: `6e6fb3e`. Jam text already added 10-25; swapped in a Jam screenshot with the new theme.
+
+## 2026-10-31
+
+- Fret Driller: `646c918` (2026-10-30), live at /fret-driller/. Added a Jam paragraph: 23 tracks, 12 grooves, five chord sounds, Roman-numeral presets with a key picker, key cycle, My tracks. Screenshot unchanged.
+- NFL Predictor (private repo, public page only): `e3fad57` (2026-10-30). REPORT.md correction of 2026-10-26 (leak found by the test suite): held-out accuracy 66.3% → 66.2%, log-loss 0.6242 → 0.6244. Added the leakage-test, sign-in picks/leaderboard and ratings/playoff-odds bullets from README.md and the public page. Calibration table and the 170-disagreement split are still the pre-correction REPORT.md figures (the report didn't restate them).
+- Vivarium: `f794f0e`, no change.
+- Rhythm Reader: `4a3d7f1`, no change.
+- isfl-football-sim: `5949409`, no change.
+- gamedev-studio-site: `2d267c2`, no change (no new devlog posts).
+- All six Pages sites return 200 and the site links to each.
