@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-05T18:49:27.255Z",
+  "generated": "2026-11-06T18:04:39.249Z",
   "repos": {
     "vivarium": {
       "updated": "2026-10-20T09:03:50Z",
@@ -18,7 +18,7 @@
     },
     "rhythm-reader": {
       "updated": "2026-10-07T04:57:01Z",
-      "commits30d": 2,
+      "commits30d": 0,
       "latest": "Add live URL to README"
     }
   }
