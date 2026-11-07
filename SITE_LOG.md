@@ -56,3 +56,13 @@ Each update records where every source project stood, so the next update only lo
 - NFL Predictor (private repo, public page only): `622217a` (2026-11-05), weekly refreshes and scores through week 9 only; REPORT.md still 2026-10-26, no change.
 - Asteroid Miner: no commits since the last update.
 - Rhythm Reader `4a3d7f1`, isfl-football-sim `5949409`, gamedev-studio-site `2d267c2`: no change.
+
+## 2026-11-07
+
+- Added to `site-update/2026-11-05` (PR #3, still open, stacked on #2) instead of opening a third PR.
+- Vivarium: `1683c54` (2026-11-04) on `claude/sweet-planck-lhh90j` (vivarium PR #1, open); `main` and the live game still `f794f0e`. Cycle 50 (`5dc49c7`) corrected "mostly evolved" to "partly mechanical, reliably evolved"; the foraging beat now says so. Added the cycle 48–49 risk result (no extra caution even right after sensing a threat). Field tab now has four methods (mark–recapture, `58d51a4`), a class results page (`cf5fb68`), an instructor quick-start (`e5d53c7`) and AA contrast (`05c260b`). Stats: 4 methods, 50 cycles over three days (LOOP_LOG, Nov 2–4).
+- Fret Driller: local `f9ff54b` still 10 commits ahead and unpushed; `origin/main` and the live site still `646c918`. No change.
+- NFL Predictor (private repo, public page only): `52da531` (2026-11-06). Weekly refreshes plus a training-window change (`0e18a60`, train from 2007); REPORT.md and metrics_test.json still 2026-10-26, so no site change.
+- gamedev-studio-site: `2d267c2` (master), no new devlog posts.
+- Rhythm Reader `4a3d7f1`, isfl-football-sim `5949409`: no change.
+- All six Pages sites return 200.
