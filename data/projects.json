@@ -1,9 +1,9 @@
 {
-  "generated": "2026-11-12T18:58:34.011Z",
+  "generated": "2026-11-14T17:12:39.449Z",
   "repos": {
     "vivarium": {
       "updated": "2026-10-20T09:03:50Z",
-      "commits30d": 5,
+      "commits30d": 4,
       "latest": "Perf pass: per-species and predator hash grids, cheaper 3D brain rings"
     },
     "isfl-football-sim": {
